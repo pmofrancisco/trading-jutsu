@@ -20,13 +20,13 @@ export const currentUser = (
   next: NextFunction,
 ) => {
   if (!req.session?.jwt) {
-    return res.send({ currentUser: null });
+    return next();
   }
 
   try {
     const payload = jwt.verify(req.session.jwt, process.env.TJ_JWT_KEY!) as UserPayload;
     req.currentUser = payload;
-  } catch(err) {}
-
-  next();
+  } finally {
+    next();
+  }
 };
