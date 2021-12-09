@@ -1,15 +1,22 @@
 import express from 'express';
 import 'express-async-errors';
 import { json } from 'body-parser';
+import cookieSession from 'cookie-session';
 import mongoose from 'mongoose';
 
 import { errorHandler } from './middlewares/error-handler';
 import { currentUserRouter } from './routes/current-user';
 import { signupRouter } from './routes/signup';
+import { DatabaseConnectionError } from './errors/database-connection-error';
 import { NotFoundError } from './errors/not-found-error';
 
 const app = express();
+//app.set('trust proxy', true);
 app.use(json());
+app.use(cookieSession({
+  signed: false,
+  secure: false,
+}));
 
 app.use(currentUserRouter);
 app.use(signupRouter);
@@ -21,11 +28,17 @@ app.all('*', async () => {
 app.use(errorHandler);
 
 const start = async () => {
+  if (!process.env.TJ_JWT_KEY) {
+    throw new Error('TJ_JWT_KEY must be defined');
+  }
+  if (!process.env.TJ_AUTH_CONNECTION_STRING) {
+    throw new Error('TJ_AUTH_CONNECTION_STRING must be defined');
+  }
   try {
-    await mongoose.connect(process.env.TradingJutsuAuthConnectionString!);
+    await mongoose.connect(process.env.TJ_AUTH_CONNECTION_STRING);
     console.log('Connected to MongoDB')
   } catch (err) {
-    console.log(err);
+    throw new DatabaseConnectionError();
   }
   app.listen(3000, () => {
     console.log('Listening on port 3000');
