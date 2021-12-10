@@ -30,7 +30,6 @@ router.post(
     }
 
     const passwordsMatch = await PasswordManager.compare(existingUser.password, password);
-    console.log('passwordsMatch', passwordsMatch);
     if (!passwordsMatch) {
       throw new BadRequestError('Invalid credentials');
     }
