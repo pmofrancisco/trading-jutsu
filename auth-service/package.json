@@ -5,7 +5,14 @@
   "main": "index.ts",
   "scripts": {
     "start": "ts-node-dev src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --watchAll --no-cache"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": [
+      "./src/test/setup.ts"
+    ]
   },
   "author": "Paul Michael O. Francisco",
   "license": "ISC",
@@ -21,5 +28,13 @@
     "mongoose": "^6.0.14",
     "ts-node-dev": "^1.1.8",
     "typescript": "^4.5.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.3",
+    "@types/supertest": "^2.0.11",
+    "jest": "^27.4.3",
+    "mongodb-memory-server": "^8.0.4",
+    "supertest": "^6.1.6",
+    "ts-jest": "^27.1.1"
   }
 }
