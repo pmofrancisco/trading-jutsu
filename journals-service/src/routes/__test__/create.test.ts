@@ -11,7 +11,15 @@ it('can only be accessed if the user is signed in', async () => {
 });
 
 it('returns a status other than 401 if the user is signed in', async () => {
-  const response = await request(app).post('/api/journals').send({});
+  const cookie = global.signin();
+  console.log('cookie', cookie);
+  const response = await request(app)
+    .post('/api/journals')
+    //.set('Cookie', cookie)
+    //.set('Cookie', [`express:sess=MY_COOKIE`])
+    //.set('Cookie', global.signin())
+    .send({});
+  console.log(response.status);
   expect(response.status).not.toEqual(401);
 });
 
