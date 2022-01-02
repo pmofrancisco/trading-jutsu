@@ -11,18 +11,29 @@ it('can only be accessed if the user is signed in', async () => {
 });
 
 it('returns a status other than 401 if the user is signed in', async () => {
-  const cookie = global.signin();
-  console.log('cookie', cookie);
   const response = await request(app)
     .post('/api/journals')
-    //.set('Cookie', cookie)
-    //.set('Cookie', [`express:sess=MY_COOKIE`])
-    //.set('Cookie', global.signin())
+    .set('Cookie', global.signin())
     .send({});
-  console.log(response.status);
   expect(response.status).not.toEqual(401);
 });
 
-it('returns an error if an invalid symbol is provided', async () => {});
+it('returns an error if an invalid symbol is provided', async () => {
+  await request(app)
+    .post('/api/journals')
+    .set('Cookie', global.signin())
+    .send({
+      symbol: ''
+    })
+    .expect(400);
+});
 
-it('creates a ticket with valid inputs', async () => {});
+it('creates a ticket with valid inputs', async () => {
+  await request(app)
+    .post('/api/journals')
+    .set('Cookie', global.signin())
+    .send({
+      symbol: 'BTCUSD'
+    })
+    .expect(201);
+});

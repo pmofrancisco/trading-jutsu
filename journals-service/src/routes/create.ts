@@ -1,12 +1,21 @@
-import express from 'express';
-import { currentUser, requireAuth } from '@trading-jutsu/common';
-import jwt from 'jsonwebtoken';
+import express, { Request, Response } from 'express';
+import { body } from 'express-validator';
+import { requireAuth, validateRequest } from '@trading-jutsu/common';
 
 const router = express.Router();
 
-router.post('/api/journals', async (req, res) => {
-  const payload = jwt.verify(req.session?.jwt, process.env.TJ_JWT_KEY!)
-  res.status(201).send(payload);
-});
+router.post(
+  '/api/journals',
+  requireAuth,
+  [
+    body('symbol')
+      .notEmpty()
+      .withMessage('You must supply a symbol')
+  ],
+  validateRequest,
+  async (req: Request, res: Response) => {
+    res.status(201).send({});
+  }
+);
 
 export { router as createTicketRouter };
