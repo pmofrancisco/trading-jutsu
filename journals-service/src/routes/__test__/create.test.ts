@@ -1,5 +1,6 @@
 import request from 'supertest';
 import { app } from '../../app';
+import { Journal } from '../../models/journal';
 
 it('has a route handler listening to /api/journals for post requests', async () => {
   const response = await request(app).post('/api/journals').send({});
@@ -39,12 +40,23 @@ it('returns an error if an invalid symbol is provided', async () => {
 });
 
 it('creates a ticket with valid inputs', async () => {
+  let journals = await Journal.find({});
+  expect(journals.length).toEqual(0);
+
+  const market = 'Crypto';
+  const symbol = 'BTCUSD';
+
   await request(app)
     .post('/api/journals')
     .set('Cookie', global.signin())
     .send({
-      market: 'Crypto',
-      symbol: 'BTCUSD'
+      market,
+      symbol
     })
     .expect(201);
+
+  journals = await Journal.find({});
+  expect(journals.length).toEqual(1);
+  expect(journals[0].market).toEqual(market);
+  expect(journals[0].symbol).toEqual(symbol);
 });
