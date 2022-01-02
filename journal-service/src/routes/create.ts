@@ -1,8 +1,9 @@
 import express from 'express';
+import { requireAuth } from '@trading-jutsu/common';
 
 const router = express.Router();
 
-router.post('/api/journals', async (req, res) => {
+router.post('/api/journals', requireAuth, async (req, res) => {
   res.status(201).send({});
 });
 
