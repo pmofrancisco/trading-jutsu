@@ -18,6 +18,16 @@ it('returns a status other than 401 if the user is signed in', async () => {
   expect(response.status).not.toEqual(401);
 });
 
+it('returns an error if an invalid market is provided', async () => {
+  await request(app)
+    .post('/api/journals')
+    .set('Cookie', global.signin())
+    .send({
+      market: ''
+    })
+    .expect(400);
+});
+
 it('returns an error if an invalid symbol is provided', async () => {
   await request(app)
     .post('/api/journals')
@@ -33,6 +43,7 @@ it('creates a ticket with valid inputs', async () => {
     .post('/api/journals')
     .set('Cookie', global.signin())
     .send({
+      market: 'Crypto',
       symbol: 'BTCUSD'
     })
     .expect(201);

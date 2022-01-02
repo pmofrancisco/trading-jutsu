@@ -8,9 +8,8 @@ router.post(
   '/api/journals',
   requireAuth,
   [
-    body('symbol')
-      .notEmpty()
-      .withMessage('You must supply a symbol')
+    body('market').notEmpty().withMessage('You must supply a market'),
+    body('symbol').notEmpty().withMessage('You must supply a symbol')
   ],
   validateRequest,
   async (req: Request, res: Response) => {
