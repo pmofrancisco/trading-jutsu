@@ -4,6 +4,7 @@ import { json } from 'body-parser';
 import cookieSession from 'cookie-session';
 
 import { errorHandler, NotFoundError, currentUser } from '@trading-jutsu/common';
+import { createMarketRouter } from './routes/create';
 
 const app = express();
 //app.set('trust proxy', true);
@@ -14,6 +15,8 @@ app.use(cookieSession({
   //secure: process.env.NODE_ENV !== 'test',
 }));
 app.use(currentUser);
+
+app.use(createMarketRouter);
 
 app.all('*', async () => {
   throw new NotFoundError();
