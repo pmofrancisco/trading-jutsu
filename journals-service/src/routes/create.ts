@@ -9,13 +9,16 @@ router.post(
   '/api/journals',
   requireAuth,
   [
-    body('market').notEmpty().withMessage('You must supply a market'),
+    body('marketId').notEmpty().withMessage('You must supply a market id'),
+    body('marketName').notEmpty().withMessage('You must supply a market name'),
     body('symbol').notEmpty().withMessage('You must supply a symbol')
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-    const { market, symbol } = req.body;
-    const journal = Journal.build({ market, symbol, userId: req.currentUser?.id! });
+    const { marketId, marketName, symbol } = req.body;
+    const journal = Journal.build({
+      marketId, marketName, symbol, userId: req.currentUser?.id!,
+    });
     await journal.save();
     res.status(201).send(journal);
   }
