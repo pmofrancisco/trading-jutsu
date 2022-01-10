@@ -5,6 +5,7 @@ import cookieSession from 'cookie-session';
 
 import { errorHandler, NotFoundError, currentUser } from '@trading-jutsu/common';
 import { createMarketRouter } from './routes/create';
+import { updateMarketRouter } from './routes/update';
 
 const app = express();
 //app.set('trust proxy', true);
@@ -17,6 +18,7 @@ app.use(cookieSession({
 app.use(currentUser);
 
 app.use(createMarketRouter);
+app.use(updateMarketRouter);
 
 app.all('*', async () => {
   throw new NotFoundError();
