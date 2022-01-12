@@ -3,7 +3,10 @@ import { body } from 'express-validator';
 import {
   NotAuthorizedError, NotFoundError, requireAuth, validateRequest,
 } from '@trading-jutsu/common';
+
+import { MarketUpdatedPublisher } from '../events/publishers/market-updated-publisher';
 import { Market } from '../models/market';
+import { natsWrapper } from '../nats-wrapper';
 
 const router = express.Router();
 
@@ -29,6 +32,10 @@ router.put(
 
     market.set({ name });
     await market.save();
+
+    new MarketUpdatedPublisher(natsWrapper.client).publish({
+      id, name, userId: req.currentUser!.id
+    });
 
     res.send(market);
   }
