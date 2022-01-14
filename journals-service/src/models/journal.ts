@@ -1,25 +1,27 @@
 import mongoose from 'mongoose';
-import { IJournalAttrs } from '@trading-jutsu/common';
+import { MarketDoc } from './market';
+
+interface JournalAttrs {
+  market: MarketDoc
+  symbol: string;
+  userId: string;
+};
 
 // An interface that describes the properties
 // that a Journal Model has
 interface JournalModel extends mongoose.Model<JournalDoc> {
-  build(attrs: IJournalAttrs): JournalDoc;
+  build(attrs: JournalAttrs): JournalDoc;
 };
 
 // An interface that describes the properties
 // that a Journal Document has
-interface JournalDoc extends IJournalAttrs, mongoose.Document {};
+interface JournalDoc extends JournalAttrs, mongoose.Document {};
 
 const journalSchema = new mongoose.Schema(
   {
-    marketId: {
-      type: String,
-      required: true,
-    },
-    marketName: {
-      type: String,
-      required: true,
+    market: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Market'
     },
     symbol: {
       type: String,
@@ -40,7 +42,7 @@ const journalSchema = new mongoose.Schema(
   }
 );
 
-journalSchema.statics.build = (attrs: IJournalAttrs) => new Journal(attrs);
+journalSchema.statics.build = (attrs: JournalAttrs) => new Journal(attrs);
 
 const Journal = mongoose.model<JournalDoc, JournalModel>('Journal', journalSchema);
 

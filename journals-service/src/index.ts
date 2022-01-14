@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { DatabaseConnectionError } from '@trading-jutsu/common';
 import { app } from './app';
+import { MarketCreatedListener } from './events/listeners/market-created-listener';
 import { MarketUpdatedListener } from './events/listeners/market-updated-listener';
 import { natsWrapper } from './nats-wrapper';
 
@@ -31,6 +32,7 @@ const start = async () => {
     process.on('SIGTERM', () => natsWrapper.client.close());
 
     new MarketUpdatedListener(natsWrapper.client).listen();
+    new MarketCreatedListener(natsWrapper.client).listen();
   } catch (err) {
     console.error(err);
   }

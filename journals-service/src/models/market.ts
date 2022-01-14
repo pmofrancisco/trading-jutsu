@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 interface MarketAttrs {
+  marketId: string;
   name: string;
   userId: string;
 };
@@ -13,10 +14,14 @@ interface MarketModel extends mongoose.Model<MarketDoc> {
 
 // An interface that describes the properties
 // that a Market Document has
-interface MarketDoc extends MarketAttrs, mongoose.Document {};
+export interface MarketDoc extends MarketAttrs, mongoose.Document {};
 
 const marketSchema = new mongoose.Schema(
   {
+    marketId: {
+      type: String,
+      required: true,
+    },
     name: {
       type: String,
       required: true,

@@ -1,20 +1,16 @@
-import { Listener, Subjects, MarketUpdatedEvent, IMarket } from '@trading-jutsu/common';
+import { Listener, Subjects, MarketUpdatedEvent } from '@trading-jutsu/common';
 import { Message } from 'node-nats-streaming';
-import { Journal } from '../../models/journal';
+import { Market } from '../../models/market';
 
 export class MarketUpdatedListener extends Listener<MarketUpdatedEvent> {
   readonly subject = Subjects.MarketUpdated;
   queueGroupName = 'journals-service';
 
-  async onMessage(data: IMarket, msg: Message) {
-    console.log('Event data!', data);
-
-    console.log(data.id);
-    console.log(data.name);
-    console.log(data.userId);
-
-    const journal = await Journal.findOne({ marketId: data.id, userId: data.userId });
-    journal?.set({ marketName: data.name });
+  async onMessage(data: { id: string, name: string, userId: string }, msg: Message) {
+    console.log('data', data);
+    const journal = await Market.findOne({ marketId: data.id, userId: data.userId });
+    console.log('journal', journal);
+    journal?.set({ name: data.name });
     await journal?.save();
 
     msg.ack();

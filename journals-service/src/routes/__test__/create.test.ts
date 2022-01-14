@@ -1,5 +1,6 @@
 import request from 'supertest';
 import { app } from '../../app';
+import { Market } from '../../models/market';
 import { Journal } from '../../models/journal';
 
 it('has a route handler listening to /api/journals for post requests', async () => {
@@ -29,16 +30,6 @@ it('returns an error if an invalid market id is provided', async () => {
     .expect(400);
 });
 
-it('returns an error if an invalid market name is provided', async () => {
-  await request(app)
-    .post('/api/journals')
-    .set('Cookie', global.signin())
-    .send({
-      marketName: ''
-    })
-    .expect(400);
-});
-
 it('returns an error if an invalid symbol is provided', async () => {
   await request(app)
     .post('/api/journals')
@@ -54,22 +45,21 @@ it('creates a ticket with valid inputs', async () => {
   expect(journals.length).toEqual(0);
 
   const marketId = '1';
-  const marketName = 'Crypto';
   const symbol = 'BTCUSD';
+
+  const market = Market.build({ marketId, name: 'Crypto', userId: '1' });
+  const marketSaved = await market.save();
 
   await request(app)
     .post('/api/journals')
     .set('Cookie', global.signin())
     .send({
       marketId,
-      marketName,
       symbol
     })
     .expect(201);
 
   journals = await Journal.find({});
   expect(journals.length).toEqual(1);
-  expect(journals[0].marketId).toEqual(marketId);
-  expect(journals[0].marketName).toEqual(marketName);
   expect(journals[0].symbol).toEqual(symbol);
 });

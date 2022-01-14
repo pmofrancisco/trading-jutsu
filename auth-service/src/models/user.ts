@@ -1,16 +1,20 @@
 import mongoose from 'mongoose';
-import { IUserAttrs } from '@trading-jutsu/common';
 import { PasswordManager } from '../services/password-manager';
+
+interface UserAttrs {
+  email: string;
+  password: string;
+};
 
 // An interface that describes the properties
 // that a User Model has
 interface UserModel extends mongoose.Model<UserDoc> {
-  build(attrs: IUserAttrs): UserDoc;
+  build(attrs: UserAttrs): UserDoc;
 };
 
 // An interface that describes the properties
 // that a User Document has
-interface UserDoc extends IUserAttrs, mongoose.Document {};
+interface UserDoc extends UserAttrs, mongoose.Document {};
 
 const userSchema = new mongoose.Schema(
   {
@@ -42,7 +46,7 @@ userSchema.pre('save', async function(done) {
   done();
 });
 
-userSchema.statics.build = (attrs: IUserAttrs) => new User(attrs);
+userSchema.statics.build = (attrs: UserAttrs) => new User(attrs);
 
 const User = mongoose.model<UserDoc, UserModel>('User', userSchema);
 

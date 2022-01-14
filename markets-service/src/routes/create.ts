@@ -1,7 +1,10 @@
 import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
 import { requireAuth, validateRequest } from '@trading-jutsu/common';
+
+import { MarketCreatedPublisher } from '../events/publishers/market-created-publisher';
 import { Market } from '../models/market';
+import { natsWrapper } from '../nats-wrapper';
 
 const router = express.Router();
 
@@ -17,7 +20,12 @@ router.post(
     const market = Market.build({
       name, userId: req.currentUser?.id!,
     });
-    await market.save();
+    const marketSaved = await market.save();
+
+    new MarketCreatedPublisher(natsWrapper.client).publish({
+      id: marketSaved.id, name, userId: req.currentUser!.id
+    });
+
     res.status(201).send(market);
   }
 );
