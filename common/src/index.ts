@@ -7,6 +7,7 @@ export * from './errors/request-validation-error';
 
 export * from './events/base-listener';
 export * from './events/base-publisher';
+export * from './events/market-created-event';
 export * from './events/market-updated-event';
 export * from './events/subjects';
 
@@ -14,8 +15,3 @@ export * from './middlewares/current-user';
 export * from './middlewares/error-handler';
 export * from './middlewares/require-auth';
 export * from './middlewares/validate-request';
-
-export * from './models/base-models';
-export * from './models/journal';
-export * from './models/market';
-export * from './models/user';
