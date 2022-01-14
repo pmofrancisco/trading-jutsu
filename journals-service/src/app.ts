@@ -4,7 +4,8 @@ import { json } from 'body-parser';
 import cookieSession from 'cookie-session';
 
 import { errorHandler, NotFoundError, currentUser } from '@trading-jutsu/common';
-import { createTicketRouter } from './routes/create';
+import { createJournalRouter } from './routes/create';
+import { getJournalByIdRouter } from './routes/get-by-id';
 
 const app = express();
 //app.set('trust proxy', true);
@@ -16,7 +17,8 @@ app.use(cookieSession({
 }));
 app.use(currentUser);
 
-app.use(createTicketRouter);
+app.use(createJournalRouter);
+app.use(getJournalByIdRouter);
 
 app.all('*', async () => {
   throw new NotFoundError();

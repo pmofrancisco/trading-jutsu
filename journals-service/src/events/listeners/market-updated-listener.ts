@@ -7,9 +7,7 @@ export class MarketUpdatedListener extends Listener<MarketUpdatedEvent> {
   queueGroupName = 'journals-service';
 
   async onMessage(data: { id: string, name: string, userId: string }, msg: Message) {
-    console.log('data', data);
     const journal = await Market.findOne({ marketId: data.id, userId: data.userId });
-    console.log('journal', journal);
     journal?.set({ name: data.name });
     await journal?.save();
 
