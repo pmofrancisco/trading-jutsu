@@ -7,7 +7,7 @@ export class MarketCreatedListener extends Listener<MarketCreatedEvent> {
   queueGroupName = 'journals-service';
 
   async onMessage(data: { id: string, name: string, userId: string }, msg: Message) {
-    const market = Market.build({ marketId: data.id, name: data.name, userId: data.userId });
+    const market = Market.build({ id: data.id, name: data.name, userId: data.userId });
     await market.save();
     msg.ack();
   }

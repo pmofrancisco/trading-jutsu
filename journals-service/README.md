@@ -1,0 +1,1 @@
+# Trading Jutsu - Journals Service

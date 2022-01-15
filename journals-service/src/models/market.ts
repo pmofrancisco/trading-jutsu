@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 interface MarketAttrs {
-  marketId: string;
+  id: string;
   name: string;
   userId: string;
 };
@@ -14,14 +14,13 @@ interface MarketModel extends mongoose.Model<MarketDoc> {
 
 // An interface that describes the properties
 // that a Market Document has
-export interface MarketDoc extends MarketAttrs, mongoose.Document {};
+export interface MarketDoc extends mongoose.Document {
+  name: string;
+  userId: string;
+};
 
 const marketSchema = new mongoose.Schema(
   {
-    marketId: {
-      type: String,
-      required: true,
-    },
     name: {
       type: String,
       required: true,
@@ -41,7 +40,11 @@ const marketSchema = new mongoose.Schema(
   }
 );
 
-marketSchema.statics.build = (attrs: MarketAttrs) => new Market(attrs);
+marketSchema.statics.build = (attrs: MarketAttrs) => new Market({
+  _id: attrs.id,
+  name: attrs.name,
+  userId: attrs.userId,
+});
 
 const Market = mongoose.model<MarketDoc, MarketModel>('Market', marketSchema);
 

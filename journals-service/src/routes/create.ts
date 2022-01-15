@@ -17,7 +17,7 @@ router.post(
   async (req: Request, res: Response) => {
     const { marketId, symbol } = req.body;
 
-    const market = await Market.findOne({ marketId });
+    const market = await Market.findOne({ id: marketId });
     if (!market) {
       throw new NotFoundError();
     }

@@ -44,10 +44,10 @@ it('creates a ticket with valid inputs', async () => {
   let journals = await Journal.find({});
   expect(journals.length).toEqual(0);
 
-  const marketId = '1';
+  const marketId = '61e2967887b2732673f46eef';
   const symbol = 'BTCUSD';
 
-  const market = Market.build({ marketId, name: 'Crypto', userId: '1' });
+  const market = Market.build({ id: marketId, name: 'Crypto', userId: '1' });
   const marketSaved = await market.save();
 
   await request(app)
