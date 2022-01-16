@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 
 interface MarketAttrs {
   id: string;
@@ -17,6 +18,7 @@ interface MarketModel extends mongoose.Model<MarketDoc> {
 export interface MarketDoc extends mongoose.Document {
   name: string;
   userId: string;
+  version: number;
 };
 
 const marketSchema = new mongoose.Schema(
@@ -39,6 +41,9 @@ const marketSchema = new mongoose.Schema(
     }
   }
 );
+
+marketSchema.set('versionKey', 'version');
+marketSchema.plugin(updateIfCurrentPlugin);
 
 marketSchema.statics.build = (attrs: MarketAttrs) => new Market({
   _id: attrs.id,

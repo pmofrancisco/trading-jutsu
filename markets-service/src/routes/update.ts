@@ -34,7 +34,10 @@ router.put(
     await market.save();
 
     new MarketUpdatedPublisher(natsWrapper.client).publish({
-      id, name, userId: req.currentUser!.id
+      id: market.id,
+      name: market.name,
+      userId: req.currentUser!.id,
+      version: market.version,
     });
 
     res.send(market);

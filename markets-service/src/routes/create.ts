@@ -20,10 +20,13 @@ router.post(
     const market = Market.build({
       name, userId: req.currentUser?.id!,
     });
-    const marketSaved = await market.save();
+    await market.save();
 
     new MarketCreatedPublisher(natsWrapper.client).publish({
-      id: marketSaved.id, name, userId: req.currentUser!.id
+      id: market.id,
+      name: market.name,
+      userId: req.currentUser!.id,
+      version: market.version,
     });
 
     res.status(201).send(market);

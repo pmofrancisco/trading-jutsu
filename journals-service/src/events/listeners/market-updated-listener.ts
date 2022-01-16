@@ -6,10 +6,15 @@ export class MarketUpdatedListener extends Listener<MarketUpdatedEvent> {
   readonly subject = Subjects.MarketUpdated;
   queueGroupName = 'journals-service';
 
-  async onMessage(data: { id: string, name: string, userId: string }, msg: Message) {
-    const journal = await Market.findOne({ id: data.id, userId: data.userId });
-    journal?.set({ name: data.name });
-    await journal?.save();
+  async onMessage(data: MarketUpdatedEvent['data'], msg: Message) {
+    const market = await Market.findOne({ _id: data.id, version: data.version - 1 });
+
+    if (!market) {
+      throw new Error('Market not found');
+    }
+
+    market?.set({ name: data.name });
+    await market?.save();
 
     msg.ack();
   }
