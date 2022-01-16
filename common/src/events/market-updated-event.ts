@@ -6,5 +6,6 @@ export interface MarketUpdatedEvent {
     id: string;
     name: string;
     userId: string;
+    version: number;
   };
 };
