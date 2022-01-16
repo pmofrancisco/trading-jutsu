@@ -11,6 +11,7 @@ interface MarketAttrs {
 // that a Market Model has
 interface MarketModel extends mongoose.Model<MarketDoc> {
   build(attrs: MarketAttrs): MarketDoc;
+  findByEvent(event: { id: string, version: number }): Promise<MarketDoc | null>;
 };
 
 // An interface that describes the properties
@@ -49,6 +50,11 @@ marketSchema.statics.build = (attrs: MarketAttrs) => new Market({
   _id: attrs.id,
   name: attrs.name,
   userId: attrs.userId,
+});
+
+marketSchema.statics.findByEvent = (event: { id: string, version: number }) => Market.findOne({
+  _id: event.id,
+  version: event.version - 1,
 });
 
 const Market = mongoose.model<MarketDoc, MarketModel>('Market', marketSchema);

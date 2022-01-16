@@ -7,7 +7,7 @@ export class MarketUpdatedListener extends Listener<MarketUpdatedEvent> {
   queueGroupName = 'journals-service';
 
   async onMessage(data: MarketUpdatedEvent['data'], msg: Message) {
-    const market = await Market.findOne({ _id: data.id, version: data.version - 1 });
+    const market = await Market.findByEvent(data);
 
     if (!market) {
       throw new Error('Market not found');
