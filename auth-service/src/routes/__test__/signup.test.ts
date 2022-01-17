@@ -2,13 +2,15 @@ import request from 'supertest';
 import { app } from '../../app';
 
 it('returns 201 on successful signup', async () => {
-  return request(app)
+  const response = await request(app)
     .post('/api/users/signup')
     .send({
       email: 'test@test.com',
       password: 'password',
-    })
-    .expect(201);
+    });
+    //.expect(201);
+  console.log('response.body', response.body);
+  expect(response.status).toEqual(201);
 });
 
 it('returns 400 with an invalid email', async () => {
