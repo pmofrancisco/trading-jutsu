@@ -10,6 +10,7 @@ declare global {
 let mongo: MongoMemoryServer;
 
 beforeAll(async () => {
+  process.env.TJ_JWT_KEY = 'asdfasdf';
   mongo = new MongoMemoryServer();
   await mongo.start();
   const mongoUri = mongo.getUri();
