@@ -1,8 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
-import request from 'supertest';
-import { app } from '../app';
 
 declare global {
   var signin: () => string[]
@@ -11,6 +9,7 @@ declare global {
 let mongo: MongoMemoryServer;
 
 beforeAll(async () => {
+  process.env.TJ_JWT_KEY = 'qwerty';
   mongo = new MongoMemoryServer();
   await mongo.start();
   const mongoUri = mongo.getUri();
