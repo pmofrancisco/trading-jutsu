@@ -1,8 +1,10 @@
-
 name: tests-journals-service
 
-on: pull_request
-  
+on:
+  pull_request:
+    paths:
+      - journals-service/**
+
 jobs:
   build:
     runs-on: ubuntu-latest
