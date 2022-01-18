@@ -3,7 +3,7 @@ name: tests-markets-service
 on:
   pull_request:
     paths:
-      - markets-service/**
+      - 'markets-service/**'
   
 jobs:
   build:
