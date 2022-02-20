@@ -1,6 +1,6 @@
 {
-  "name": "@trading-jutsu/components",
-  "version": "1.0.1",
+  "name": "trading-jutsu-components",
+  "version": "1.0.0",
   "description": "Trading Jutsu Components",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
