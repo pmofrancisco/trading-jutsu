@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components'
 
 export const ButtonStyles = styled.button`
@@ -17,9 +16,3 @@ export const ButtonStyles = styled.button`
 export const Button = ({ label, primary = false, onClick }) => (
   <ButtonStyles primary={primary} onClick={onClick}>{label}</ButtonStyles>
 );
-
-Button.PropTypes = {
-  label: PropTypes.string.isRequired,
-  primary: PropTypes.bool,
-  onClick: PropTypes.func,
-};
