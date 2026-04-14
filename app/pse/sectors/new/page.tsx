@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 
-export default function NewSectorPage() {
+export default function NewSector() {
   async function createSector(formData: FormData) {
     'use server';
 

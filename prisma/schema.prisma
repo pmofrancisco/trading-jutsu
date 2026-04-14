@@ -12,6 +12,24 @@ datasource db {
   provider = "postgresql"
 }
 
+model ForexCurrencyPair {
+  id      Int    @id @default(autoincrement())
+  baseCurrency   String
+  quoteCurrency  String
+  quotes  ForexQuote[]
+}
+
+model ForexQuote {
+  id      Int    @id @default(autoincrement())
+  open    Float
+  high    Float
+  low     Float
+  close   Float
+  timestamp   DateTime
+  pairId  Int
+  pair    ForexCurrencyPair @relation(fields: [pairId], references: [id])
+}
+
 model PseSector {
   id    Int    @id @default(autoincrement())
   name  String
