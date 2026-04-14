@@ -10,7 +10,9 @@ export default async function CurrencyPairs() {
       <h1>Currency Pairs</h1>
       <ul>
         {pairs.map((pair) => (
-          <li key={pair.id}>{pair.baseCurrency}/{pair.quoteCurrency}</li>
+          <li key={pair.id}>
+            <Link href={`/forex/currency-pairs/${pair.id}`}>{pair.baseCurrency}/{pair.quoteCurrency}</Link>
+          </li>
         ))}
       </ul>
       <Link href="/forex/currency-pairs/new">Add new</Link>
