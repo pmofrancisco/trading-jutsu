@@ -25,7 +25,7 @@ model ForexQuote {
   high    Float
   low     Float
   close   Float
-  timestamp   DateTime
+  quoteDate   DateTime
   pairId  Int
   pair    ForexCurrencyPair @relation(fields: [pairId], references: [id])
 }
