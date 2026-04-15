@@ -11,7 +11,7 @@ const CreateCurrencyPairSchema = z.object({
 });
 
 export default async function createForexCurrencyPair(
-  formState: { errors: { baseCurrency?: string[]; quoteCurrency?: string[] } },
+  formState: { errors: { baseCurrency?: string[]; quoteCurrency?: string[] }, message?: string },
   formData: FormData
 ) {
   const baseCurrency = formData.get('base-currency') as string;
@@ -23,12 +23,20 @@ export default async function createForexCurrencyPair(
     return { errors: validationResult.error.flatten().fieldErrors };
   }
 
-  await prisma.forexCurrencyPair.create({
-    data: {
-      baseCurrency,
-      quoteCurrency,
-    },
-  });
+  try {
+    await prisma.forexCurrencyPair.create({
+      data: {
+        baseCurrency,
+        quoteCurrency,
+      },
+    });
+  } catch (err) {
+    if (err instanceof Error) {
+      return { errors: { baseCurrency: [], quoteCurrency: [] } , message: err.message };
+    } else {
+      return { errors: { baseCurrency: [], quoteCurrency: [] } , message: 'Something went wrong' };
+    }
+  }
 
   redirect('/forex/currency-pairs');
 }

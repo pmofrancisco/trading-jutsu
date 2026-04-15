@@ -4,7 +4,7 @@ import { useActionState } from 'react';
 import { createForexCurrencyPair } from '@/actions';
 
 export default function NewCurrencyPair() {
-  const [formState, action] = useActionState(createForexCurrencyPair, { errors: { baseCurrency: [], quoteCurrency: [] } });
+  const [formState, action] = useActionState(createForexCurrencyPair, { errors: { baseCurrency: [], quoteCurrency: [] }, message: '' });
 
   return (
     <div className="p-2">
@@ -16,6 +16,7 @@ export default function NewCurrencyPair() {
         <label htmlFor="quote-currency">Quote Currency:</label>
         <input type="text" id="quote-currency" name="quote-currency" className="rounded border" />
         <p className='text-red-500'>{formState?.errors.quoteCurrency?.[0]}</p>
+        <p className='text-red-500'>{formState?.message}</p>
         <button type="submit" className="rounded border">Save</button>
       </form>
     </div>
