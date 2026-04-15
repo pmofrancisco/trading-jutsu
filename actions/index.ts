@@ -1,0 +1,1 @@
+export { default as createForexCurrencyPair } from './create-forex-currency-pair';
