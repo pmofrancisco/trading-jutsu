@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { z } from "zod";
@@ -38,5 +39,6 @@ export default async function createForexCurrencyPair(
     }
   }
 
+  revalidatePath('/forex/currency-pairs');
   redirect('/forex/currency-pairs');
 }

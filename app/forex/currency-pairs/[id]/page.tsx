@@ -41,3 +41,8 @@ export default async function CurrencyPair(props: CurrencyPairProps) {
     </div>
   );
 }
+
+export async function generateStaticParams() {
+  const currencyPairs = await prisma.forexCurrencyPair.findMany();
+  return currencyPairs.map((pair) => ({ id: pair.id.toString() }));
+}
