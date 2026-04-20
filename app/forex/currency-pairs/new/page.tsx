@@ -1,6 +1,7 @@
 'use client';
 
 import { useActionState } from 'react';
+import { Button } from '@heroui/react';
 import { createForexCurrencyPair } from '@/actions';
 
 export default function NewCurrencyPair() {
@@ -17,7 +18,9 @@ export default function NewCurrencyPair() {
         <input type="text" id="quote-currency" name="quote-currency" className="rounded border" />
         <p className='text-red-500'>{formState?.errors.quoteCurrency?.[0]}</p>
         <p className='text-red-500'>{formState?.message}</p>
-        <button type="submit" className="rounded border">Save</button>
+        <Button type="submit" className="rounded border">
+          Save
+        </Button>
       </form>
     </div>
   );
