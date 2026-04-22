@@ -1,8 +1,10 @@
-import { prisma } from '@/lib/prisma';
-import paths from '@/paths';
-import { Plus } from '@gravity-ui/icons';
 import { Breadcrumbs, Button, Table } from '@heroui/react';
 import Link from 'next/link';
+
+import { Plus } from '@gravity-ui/icons';
+
+import { prisma } from '@/lib/prisma';
+import { paths } from '@/paths';
 
 export default async function CurrencyPairs() {
   const pairs = await prisma.forexCurrencyPair.findMany();

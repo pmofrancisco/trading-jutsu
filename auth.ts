@@ -15,4 +15,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientSecret: GITHUB_CLIENT_SECRET,
     }),
   ],
+  callbacks: {
+    signIn: async ({ user }) => {
+      const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+
+      if (!ADMIN_EMAIL) {
+        throw new Error('Missing admin email');
+      }
+
+      return user?.email === ADMIN_EMAIL;
+    },
+  },
 });

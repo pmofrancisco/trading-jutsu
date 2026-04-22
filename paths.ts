@@ -1,4 +1,4 @@
-const paths = {
+export const paths = {
   home: () => '/',
   admin: {
     forex: {
@@ -8,5 +8,3 @@ const paths = {
     },
   },
 };
-
-export default paths;
