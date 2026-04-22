@@ -27,6 +27,15 @@ export default function Header() {
                 <Link href="/pse" onClick={() => setIsOpen(false)}>
                   PSE
                 </Link>
+                <div className="font-bold border-t border-gray-100 pt-2">
+                  Admin
+                </div>
+                <Link
+                  href="/admin/pse/sectors"
+                  onClick={() => setIsOpen(false)}
+                >
+                  PSE Sectors
+                </Link>
               </Drawer.Body>
             </Drawer.Dialog>
           </Drawer.Content>
