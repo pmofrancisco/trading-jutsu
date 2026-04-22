@@ -50,6 +50,6 @@ export default async function createForexCurrencyPair(
     }
   }
 
-  revalidatePath('/forex/currency-pairs');
-  redirect('/forex/currency-pairs');
+  revalidatePath('/admin/forex/currency-pairs');
+  redirect('/admin/forex/currency-pairs');
 }

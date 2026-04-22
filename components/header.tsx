@@ -31,6 +31,12 @@ export default function Header() {
                   Admin
                 </div>
                 <Link
+                  href="/admin/forex/currency-pairs"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Forex Currency Pairs
+                </Link>
+                <Link
                   href="/admin/pse/sectors"
                   onClick={() => setIsOpen(false)}
                 >

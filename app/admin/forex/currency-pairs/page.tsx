@@ -1,21 +1,26 @@
+import { Plus } from '@gravity-ui/icons';
+import { Breadcrumbs, Button, Table } from '@heroui/react';
 import { prisma } from '@/lib/prisma';
-import { Breadcrumbs, Table } from '@heroui/react';
 import Link from 'next/link';
 
 export default async function CurrencyPairs() {
   const pairs = await prisma.forexCurrencyPair.findMany();
 
   return (
-    <div className="flex flex-col gap-4">
-      <Breadcrumbs>
-        <Breadcrumbs.Item>
-          <Link href="/">Home</Link>
-        </Breadcrumbs.Item>
-        <Breadcrumbs.Item>
-          <Link href="/forex">Forex</Link>
-        </Breadcrumbs.Item>
-        <Breadcrumbs.Item>Currency Pairs</Breadcrumbs.Item>
-      </Breadcrumbs>
+    <div className="flex flex-col gap-1">
+      <div className="flex items-center justify-between w-full">
+        <Breadcrumbs>
+          <Breadcrumbs.Item>
+            <Link href="/">Home</Link>
+          </Breadcrumbs.Item>
+          <Breadcrumbs.Item>Admin Forex Currency Pairs</Breadcrumbs.Item>
+        </Breadcrumbs>
+        <Button isIconOnly variant="ghost">
+          <Link href="/admin/forex/currency-pairs/new">
+            <Plus />
+          </Link>
+        </Button>
+      </div>
       <Table>
         <Table.ScrollContainer>
           <Table.Content>
@@ -37,7 +42,6 @@ export default async function CurrencyPairs() {
           </Table.Content>
         </Table.ScrollContainer>
       </Table>
-      <Link href="/forex/currency-pairs/new">Add new</Link>
     </div>
   );
 }
