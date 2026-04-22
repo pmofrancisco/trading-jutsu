@@ -1,6 +1,7 @@
+import { prisma } from '@/lib/prisma';
+import paths from '@/paths';
 import { Plus } from '@gravity-ui/icons';
 import { Breadcrumbs, Button, Table } from '@heroui/react';
-import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 
 export default async function CurrencyPairs() {
@@ -16,7 +17,7 @@ export default async function CurrencyPairs() {
           <Breadcrumbs.Item>Admin Forex Currency Pairs</Breadcrumbs.Item>
         </Breadcrumbs>
         <Button isIconOnly variant="ghost">
-          <Link href="/admin/forex/currency-pairs/new">
+          <Link href={paths.admin.forex.currencyPairCreate()}>
             <Plus />
           </Link>
         </Button>
@@ -31,7 +32,7 @@ export default async function CurrencyPairs() {
               {pairs.map((pair) => (
                 <Table.Row key={pair.id}>
                   <Table.Cell>
-                    <Link href={`/forex/currency-pairs/${pair.id}`}>
+                    <Link href={paths.admin.forex.currencyPair(pair.id)}>
                       {pair.baseCurrency}
                       {pair.quoteCurrency}
                     </Link>

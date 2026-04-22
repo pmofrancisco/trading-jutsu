@@ -1,6 +1,7 @@
 'use server';
 
 import { prisma } from '@/lib/prisma';
+import paths from '@/paths';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
@@ -10,7 +11,7 @@ const CreateCurrencyPairSchema = z.object({
   quoteCurrency: z.string().min(1),
 });
 
-export default async function createForexCurrencyPair(
+export async function createForexCurrencyPair(
   formState: {
     errors: { baseCurrency?: string[]; quoteCurrency?: string[] };
     message?: string;
@@ -50,6 +51,6 @@ export default async function createForexCurrencyPair(
     }
   }
 
-  revalidatePath('/admin/forex/currency-pairs');
-  redirect('/admin/forex/currency-pairs');
+  revalidatePath(paths.admin.forex.currencyPairList());
+  redirect(paths.admin.forex.currencyPairList());
 }

@@ -1,6 +1,7 @@
-import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
+import paths from '@/paths';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
 interface CurrencyPairProps {
   params: Promise<{
@@ -24,7 +25,7 @@ export default async function CurrencyPair(props: CurrencyPairProps) {
 
   return (
     <div>
-      <Link href="/forex/currency-pairs">Back</Link>
+      <Link href={paths.admin.forex.currencyPairList()}>Back</Link>
       <h1>
         {currencyPair.baseCurrency}/{currencyPair.quoteCurrency}
       </h1>

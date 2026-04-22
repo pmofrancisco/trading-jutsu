@@ -1,5 +1,6 @@
 'use client';
 
+import paths from '@/paths';
 import { Bars } from '@gravity-ui/icons';
 import { Button, Drawer } from '@heroui/react';
 import Link from 'next/link';
@@ -31,7 +32,7 @@ export default function Header() {
                   Admin
                 </div>
                 <Link
-                  href="/admin/forex/currency-pairs"
+                  href={paths.admin.forex.currencyPairList()}
                   onClick={() => setIsOpen(false)}
                 >
                   Forex Currency Pairs

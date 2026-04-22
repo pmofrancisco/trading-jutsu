@@ -1,1 +1,1 @@
-export { default as createForexCurrencyPair } from './create-forex-currency-pair';
+export { createForexCurrencyPair } from './admin/forex/create-forex-currency-pair';
