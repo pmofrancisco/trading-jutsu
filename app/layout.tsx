@@ -44,7 +44,9 @@ export default async function RootLayout({
             </>
           ) : (
             <div className="p-6 border rounded-xl flex flex-col items-center gap-16 fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-              <h1 className="text-2xl font-bold">Sign in to Trading Jutsu</h1>
+              <h1 className="text-2xl font-bold text-center">
+                Sign in to Trading Jutsu
+              </h1>
               <SignInButton />
             </div>
           )}

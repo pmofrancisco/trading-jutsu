@@ -59,28 +59,25 @@ export default function Header() {
           Trading Jutsu
         </Link>
       </div>
-      <div className="flex items-center gap-3">
-        <div>{session.data?.user?.email}</div>
-        <Popover>
-          <Button variant="ghost" isIconOnly>
-            <Avatar className="size-8">
-              <Avatar.Image
-                src={session.data?.user?.image || ''}
-                alt={session.data?.user?.name || 'User'}
-              />
-            </Avatar>
-          </Button>
-          <Popover.Content className="p-4">
-            <div className="font-bold">{session.data?.user?.name}</div>
-            <div className="mb-3">{session.data?.user?.email}</div>
-            <form action={signOut} className="w-full">
-              <Button className="w-full" type="submit" variant="outline">
-                Sign out
-              </Button>
-            </form>
-          </Popover.Content>
-        </Popover>
-      </div>
+      <Popover>
+        <Button variant="ghost" isIconOnly>
+          <Avatar className="size-8">
+            <Avatar.Image
+              src={session.data?.user?.image || ''}
+              alt={session.data?.user?.name || 'User'}
+            />
+          </Avatar>
+        </Button>
+        <Popover.Content className="p-4">
+          <div className="font-bold">{session.data?.user?.name}</div>
+          <div className="mb-3">{session.data?.user?.email}</div>
+          <form action={signOut} className="w-full">
+            <Button className="w-full" type="submit" variant="outline">
+              Sign out
+            </Button>
+          </form>
+        </Popover.Content>
+      </Popover>
     </div>
   );
 }
