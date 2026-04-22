@@ -1,5 +1,3 @@
 export default function Pse() {
-  return (
-    <div>PSE Page</div>
-  );
+  return <div>PSE Page</div>;
 }

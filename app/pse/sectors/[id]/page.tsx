@@ -1,15 +1,15 @@
-import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { notFound } from 'next/navigation';
+import { prisma } from '@/lib/prisma';
 
 interface SectorProps {
   params: Promise<{
     id: string;
-  }>
+  }>;
 }
 
 export default async function Sector(props: SectorProps) {
   const { id } = await props.params;
-  
+
   const sector = await prisma.pseSector.findFirst({
     where: {
       id: parseInt(id),

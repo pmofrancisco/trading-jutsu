@@ -1,5 +1,3 @@
 export default function Crypto() {
-    return (
-        <div>Crypto Page</div>
-    );
+  return <div>Crypto Page</div>;
 }

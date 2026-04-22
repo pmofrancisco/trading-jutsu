@@ -1,8 +1,8 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from '@/lib/prisma';
 
 export default async function Sectors() {
   const sectors = await prisma.pseSector.findMany();
-  
+
   return (
     <div>
       <h1>Sectors</h1>

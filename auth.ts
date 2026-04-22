@@ -1,4 +1,4 @@
-import NextAuth from "next-auth"
+import NextAuth from 'next-auth';
 import Github from 'next-auth/providers/github';
 
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
@@ -15,4 +15,4 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientSecret: GITHUB_CLIENT_SECRET,
     }),
   ],
-})
+});
