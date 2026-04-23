@@ -2,9 +2,8 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { SessionProvider } from 'next-auth/react';
 
-import { auth } from '@/auth';
 import Header from '@/components/header';
-import SignInButton from '@/components/sign-in-button';
+import PageGuard from '@/components/page-guard';
 
 import './globals.css';
 
@@ -28,28 +27,17 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth();
-
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <SessionProvider session={session}>
-          {session?.user ? (
-            <>
-              <Header />
-              <div className="p-4">{children}</div>
-            </>
-          ) : (
-            <div className="p-6 border rounded-xl flex flex-col items-center gap-16 fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-              <h1 className="text-2xl font-bold text-center">
-                Sign in to Trading Jutsu
-              </h1>
-              <SignInButton />
-            </div>
-          )}
+        <SessionProvider>
+          <PageGuard>
+            <Header />
+            <div className="p-4">{children}</div>
+          </PageGuard>
         </SessionProvider>
       </body>
     </html>
