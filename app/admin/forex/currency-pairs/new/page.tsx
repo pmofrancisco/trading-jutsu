@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { startTransition, useActionState } from 'react';
 import { Button } from '@heroui/react';
 import { createForexCurrencyPair } from '@/actions';
 
@@ -9,10 +9,18 @@ export default function NewCurrencyPair() {
     errors: { baseCurrency: [], quoteCurrency: [], _form: [] },
   });
 
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    startTransition(() => {
+      action(formData);
+    });
+  }
+
   return (
     <div className="p-2">
       <h1 className="font-bold mb-2">Create a new Forex Currency Pair</h1>
-      <form className="flex flex-col gap-2" action={action}>
+      <form className="flex flex-col gap-2" onSubmit={handleSubmit} noValidate>
         <label htmlFor="base-currency">Base Currency:</label>
         <input
           type="text"

@@ -33,7 +33,7 @@ export async function createForexCurrencyPair(
   });
 
   if (!validationResult.success) {
-    return { errors: validationResult.error.flatten().fieldErrors };
+    return { errors: z.flattenError(validationResult.error).fieldErrors };
   }
 
   try {
