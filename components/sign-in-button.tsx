@@ -5,7 +5,7 @@ import { signIn } from '@/actions';
 import { useActionState } from 'react';
 
 export default function SignInButton() {
-  const [, action, isPending] = useActionState(signIn, {});
+  const [, action, isPending] = useActionState(signIn, false);
 
   return (
     <form action={action} className="w-full">

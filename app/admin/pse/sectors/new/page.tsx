@@ -1,5 +1,7 @@
 import { redirect } from 'next/navigation';
+
 import { prisma } from '@/lib/prisma';
+import { paths } from '@/paths';
 
 export default function NewSector() {
   async function createSector(formData: FormData) {
@@ -13,7 +15,7 @@ export default function NewSector() {
       },
     });
 
-    redirect('/pse/sectors');
+    redirect(paths.admin.pse.sectorList());
   }
 
   return (

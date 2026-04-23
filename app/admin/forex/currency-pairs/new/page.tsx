@@ -6,8 +6,7 @@ import { createForexCurrencyPair } from '@/actions';
 
 export default function NewCurrencyPair() {
   const [formState, action] = useActionState(createForexCurrencyPair, {
-    errors: { baseCurrency: [], quoteCurrency: [] },
-    message: '',
+    errors: { baseCurrency: [], quoteCurrency: [], _form: [] },
   });
 
   return (
@@ -30,7 +29,7 @@ export default function NewCurrencyPair() {
           className="rounded border"
         />
         <p className="text-red-500">{formState?.errors.quoteCurrency?.[0]}</p>
-        <p className="text-red-500">{formState?.message}</p>
+        <p className="text-red-500">{formState?.errors._form?.[0]}</p>
         <Button type="submit" className="rounded border">
           Save
         </Button>

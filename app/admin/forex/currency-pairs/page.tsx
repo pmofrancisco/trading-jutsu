@@ -14,7 +14,7 @@ export default async function CurrencyPairs() {
       <div className="flex items-center justify-between w-full">
         <Breadcrumbs>
           <Breadcrumbs.Item>
-            <Link href="/">Home</Link>
+            <Link href={paths.home()}>Home</Link>
           </Breadcrumbs.Item>
           <Breadcrumbs.Item>Admin Forex Currency Pairs</Breadcrumbs.Item>
         </Breadcrumbs>

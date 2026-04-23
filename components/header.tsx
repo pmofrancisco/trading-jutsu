@@ -26,13 +26,22 @@ export default function Header() {
             <Drawer.Content placement="left">
               <Drawer.Dialog>
                 <Drawer.Body className="flex flex-col gap-2">
-                  <Link href="/crypto" onClick={() => setIsOpen(false)}>
+                  <Link
+                    href={paths.crypto.index()}
+                    onClick={() => setIsOpen(false)}
+                  >
                     Crypto
                   </Link>
-                  <Link href="/forex" onClick={() => setIsOpen(false)}>
+                  <Link
+                    href={paths.forex.index()}
+                    onClick={() => setIsOpen(false)}
+                  >
                     Forex
                   </Link>
-                  <Link href="/pse" onClick={() => setIsOpen(false)}>
+                  <Link
+                    href={paths.pse.index()}
+                    onClick={() => setIsOpen(false)}
+                  >
                     PSE
                   </Link>
                   <div className="font-bold border-t border-gray-100 pt-2">
@@ -45,7 +54,7 @@ export default function Header() {
                     Forex Currency Pairs
                   </Link>
                   <Link
-                    href="/admin/pse/sectors"
+                    href={paths.admin.pse.sectorList()}
                     onClick={() => setIsOpen(false)}
                   >
                     PSE Sectors
@@ -55,7 +64,7 @@ export default function Header() {
             </Drawer.Content>
           </Drawer.Backdrop>
         </Drawer>
-        <Link className="font-bold" href="/">
+        <Link className="font-bold" href={paths.home()}>
           Trading Jutsu
         </Link>
       </div>

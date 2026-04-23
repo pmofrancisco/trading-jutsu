@@ -7,22 +7,27 @@ import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { paths } from '@/paths';
 
-const CreateCurrencyPairSchema = z.object({
+const createCurrencyPairSchema = z.object({
   baseCurrency: z.string().min(1),
   quoteCurrency: z.string().min(1),
 });
 
+interface ICreateForexCurrencyPairFormState {
+  errors: {
+    baseCurrency?: string[];
+    quoteCurrency?: string[];
+    _form?: string[];
+  };
+}
+
 export async function createForexCurrencyPair(
-  formState: {
-    errors: { baseCurrency?: string[]; quoteCurrency?: string[] };
-    message?: string;
-  },
+  formState: ICreateForexCurrencyPairFormState,
   formData: FormData,
-) {
+): Promise<ICreateForexCurrencyPairFormState> {
   const baseCurrency = formData.get('base-currency') as string;
   const quoteCurrency = formData.get('quote-currency') as string;
 
-  const validationResult = CreateCurrencyPairSchema.safeParse({
+  const validationResult = createCurrencyPairSchema.safeParse({
     baseCurrency,
     quoteCurrency,
   });
@@ -41,13 +46,15 @@ export async function createForexCurrencyPair(
   } catch (err) {
     if (err instanceof Error) {
       return {
-        errors: { baseCurrency: [], quoteCurrency: [] },
-        message: err.message,
+        errors: { baseCurrency: [], quoteCurrency: [], _form: [err.message] },
       };
     } else {
       return {
-        errors: { baseCurrency: [], quoteCurrency: [] },
-        message: 'Something went wrong',
+        errors: {
+          baseCurrency: [],
+          quoteCurrency: [],
+          _form: ['Something went wrong'],
+        },
       };
     }
   }
