@@ -1,11 +1,10 @@
 'use server';
 
+import { prisma } from '@/lib/prisma';
+import { paths } from '@/paths';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
-
-import { prisma } from '@/lib/prisma';
-import { paths } from '@/paths';
 
 const createCurrencyPairSchema = z.object({
   baseCurrency: z.string().min(1),

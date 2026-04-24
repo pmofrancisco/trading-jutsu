@@ -1,7 +1,7 @@
 'use client';
 
-import { Button, Spinner } from '@heroui/react';
 import { signIn } from '@/actions';
+import { Button, Spinner } from '@heroui/react';
 import { useActionState } from 'react';
 
 export default function SignInButton() {

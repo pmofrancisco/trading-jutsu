@@ -1,15 +1,12 @@
 'use client';
 
-import Link from 'next/link';
-import { useSession } from 'next-auth/react';
-import { useState } from 'react';
-
-import { Avatar, Button, Drawer, Popover } from '@heroui/react';
-import { Bars } from '@gravity-ui/icons';
-
-import { paths } from '@/paths';
-
 import { signOut } from '@/actions';
+import { paths } from '@/paths';
+import { Bars } from '@gravity-ui/icons';
+import { Avatar, Button, Drawer, Popover } from '@heroui/react';
+import { useSession } from 'next-auth/react';
+import Link from 'next/link';
+import { useState } from 'react';
 
 export default function Header() {
   const session = useSession();

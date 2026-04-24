@@ -1,8 +1,8 @@
 'use client';
 
-import { startTransition, useActionState } from 'react';
-import { Button } from '@heroui/react';
 import { createForexCurrencyPair } from '@/actions';
+import { Button } from '@heroui/react';
+import { startTransition, useActionState } from 'react';
 
 export default function NewCurrencyPair() {
   const [formState, action] = useActionState(createForexCurrencyPair, {
