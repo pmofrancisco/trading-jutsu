@@ -6,7 +6,7 @@ import { startTransition, useActionState } from 'react';
 
 export default function NewCurrencyPair() {
   const [formState, action] = useActionState(createForexCurrencyPair, {
-    errors: { baseCurrency: [], quoteCurrency: [], _form: [] },
+    errors: {},
   });
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {

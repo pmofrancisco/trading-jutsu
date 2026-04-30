@@ -9,8 +9,8 @@ interface CurrencyPairProps {
   }>;
 }
 
-export default async function CurrencyPair(props: CurrencyPairProps) {
-  const { id } = await props.params;
+export default async function CurrencyPair({ params }: CurrencyPairProps) {
+  const { id } = await params;
 
   const currencyPair = await prisma.forexCurrencyPair.findFirst({
     where: {
