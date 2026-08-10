@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { auth } from '@/lib/auth';
+import { auth, isAllowedEmail } from '@/lib/auth';
 import { paths } from '@/paths';
 import { redirect } from 'next/navigation';
 import { cache } from 'react';
@@ -23,7 +23,10 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
   const session = await auth();
   const user = session?.user;
 
-  if (!user?.email) {
+  // Re-checking the allowlist here — and not only in the `signIn` callback —
+  // is what makes revoking access take effect on the next request rather than
+  // whenever the JWT happens to expire.
+  if (!user?.email || !isAllowedEmail(user.email)) {
     return null;
   }
 
@@ -37,13 +40,13 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
 /**
  * The authorization gate for every data function. Server Actions are reachable
  * by direct POST, so this must be called inside the data layer itself and not
- * only from the page that renders the UI.
+ * only from the layout that renders the UI.
  */
 export async function requireUser(): Promise<SessionUser> {
   const user = await getCurrentUser();
 
   if (!user) {
-    redirect(paths.home());
+    redirect(paths.signIn());
   }
 
   return user;
