@@ -35,26 +35,34 @@ export default function ThemeSwitch() {
       // go too, or hovering flashes the accent back.
       className="[--switch-control-bg-checked:var(--color-segment)] [--switch-control-bg-checked-hover:var(--color-segment)]"
     >
-      <Switch.Control>
-        {/*
-         * `pointer-events-none`: react-aria's press handling ignores clicks
-         * whose target is the icon's SVG, so without this the thumb — the most
-         * obvious place to click — is dead and only the bare track responds.
-         * Clicks fall through to the control, which covers the same area.
-         */}
-        {/*
-         * `text-black`: when checked, HeroUI recolors the thumb's contents to
-         * the accent, which would leave a blue moon on the gray track. The
-         * utility wins on layer order, not specificity.
-         */}
-        <Switch.Thumb className="items-center justify-center pointer-events-none text-black">
-          {isDark ? (
-            <Moon width={11} height={11} />
-          ) : (
-            <Sun width={11} height={11} />
-          )}
-        </Switch.Thumb>
-      </Switch.Control>
+      {/*
+       * `Switch.Content` is the interactive part — it renders react-aria's
+       * `SwitchButton` label. The root only renders `SwitchField`, which holds
+       * the input and state but nothing clickable, so omitting this leaves the
+       * switch inert. It is also what `switch.css` keys hover/press styling off.
+       */}
+      <Switch.Content>
+        <Switch.Control>
+          {/*
+           * `pointer-events-none`: react-aria's press handling ignores clicks
+           * whose target is the icon's SVG, so without this the thumb — the most
+           * obvious place to click — is dead and only the bare track responds.
+           * Clicks fall through to the control, which covers the same area.
+           */}
+          {/*
+           * `text-black`: when checked, HeroUI recolors the thumb's contents to
+           * the accent, which would leave a blue moon on the gray track. The
+           * utility wins on layer order, not specificity.
+           */}
+          <Switch.Thumb className="items-center justify-center pointer-events-none text-black">
+            {isDark ? (
+              <Moon width={11} height={11} />
+            ) : (
+              <Sun width={11} height={11} />
+            )}
+          </Switch.Thumb>
+        </Switch.Control>
+      </Switch.Content>
     </Switch>
   );
 }
