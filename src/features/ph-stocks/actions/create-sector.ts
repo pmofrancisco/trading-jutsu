@@ -1,6 +1,6 @@
 'use server';
 
-import { createSector } from '@/features/pse/data/sectors';
+import { createSector } from '@/features/ph-stocks/data/sectors';
 import { toUnexpectedFormError, type FormState } from '@/lib/form-state';
 import { paths } from '@/paths';
 import { revalidatePath } from 'next/cache';
@@ -13,7 +13,7 @@ const createSectorSchema = z.object({
 
 export type CreateSectorFormState = FormState<'name'>;
 
-export async function createPseSector(
+export async function createPhStocksSector(
   formState: CreateSectorFormState,
   formData: FormData,
 ): Promise<CreateSectorFormState> {
@@ -33,6 +33,6 @@ export async function createPseSector(
     return toUnexpectedFormError(err);
   }
 
-  revalidatePath(paths.admin.pse.sectorList());
-  redirect(paths.admin.pse.sectorList());
+  revalidatePath(paths.admin.phStocks.sectorList());
+  redirect(paths.admin.phStocks.sectorList());
 }

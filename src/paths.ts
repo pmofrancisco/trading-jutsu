@@ -6,8 +6,8 @@ export const paths = {
   forex: {
     index: () => '/forex',
   },
-  pse: {
-    index: () => '/pse',
+  phStocks: {
+    index: () => '/ph-stocks',
   },
   admin: {
     forex: {
@@ -15,10 +15,10 @@ export const paths = {
       currencyPairCreate: () => '/admin/forex/currency-pairs/new',
       currencyPairList: () => '/admin/forex/currency-pairs',
     },
-    pse: {
-      sector: (id: number) => `/admin/pse/sectors/${id}`,
-      sectorCreate: () => '/admin/pse/sectors/new',
-      sectorList: () => '/admin/pse/sectors',
+    phStocks: {
+      sector: (id: number) => `/admin/ph-stocks/sectors/${id}`,
+      sectorCreate: () => '/admin/ph-stocks/sectors/new',
+      sectorList: () => '/admin/ph-stocks/sectors',
     },
   },
 };

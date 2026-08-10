@@ -1,11 +1,11 @@
 'use client';
 
-import { createPseSector } from '@/features/pse/actions/create-sector';
+import { createPhStocksSector } from '@/features/ph-stocks/actions/create-sector';
 import { Button } from '@heroui/react';
 import { startTransition, useActionState } from 'react';
 
 export default function SectorForm() {
-  const [formState, action] = useActionState(createPseSector, {
+  const [formState, action] = useActionState(createPhStocksSector, {
     errors: {},
   });
 
