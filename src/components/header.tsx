@@ -36,10 +36,10 @@ export default function Header() {
                     Forex
                   </Link>
                   <Link
-                    href={paths.pse.index()}
+                    href={paths.phStocks.index()}
                     onClick={() => setIsOpen(false)}
                   >
-                    PSE
+                    PH Stocks
                   </Link>
                   <div className="font-bold border-t border-gray-100 pt-2">
                     Admin
@@ -51,10 +51,10 @@ export default function Header() {
                     Forex Currency Pairs
                   </Link>
                   <Link
-                    href={paths.admin.pse.sectorList()}
+                    href={paths.admin.phStocks.sectorList()}
                     onClick={() => setIsOpen(false)}
                   >
-                    PSE Sectors
+                    PH Stocks Sectors
                   </Link>
                 </Drawer.Body>
               </Drawer.Dialog>

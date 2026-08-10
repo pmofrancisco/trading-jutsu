@@ -1,4 +1,4 @@
-import { listSectors } from '@/features/pse/data/sectors';
+import { listSectors } from '@/features/ph-stocks/data/sectors';
 import { paths } from '@/paths';
 import { Plus } from '@gravity-ui/icons';
 import { Button } from '@heroui/react';
@@ -12,7 +12,7 @@ export default async function Sectors() {
       <div className="flex items-center justify-between w-full">
         <h1>Sectors</h1>
         <Button isIconOnly variant="ghost">
-          <Link href={paths.admin.pse.sectorCreate()}>
+          <Link href={paths.admin.phStocks.sectorCreate()}>
             <Plus />
           </Link>
         </Button>
@@ -20,7 +20,9 @@ export default async function Sectors() {
       <ul>
         {sectors.map((sector) => (
           <li key={sector.id}>
-            <Link href={paths.admin.pse.sector(sector.id)}>{sector.name}</Link>
+            <Link href={paths.admin.phStocks.sector(sector.id)}>
+              {sector.name}
+            </Link>
           </li>
         ))}
       </ul>

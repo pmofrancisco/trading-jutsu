@@ -1,4 +1,4 @@
-import { getSector } from '@/features/pse/data/sectors';
+import { getSector } from '@/features/ph-stocks/data/sectors';
 import { notFound } from 'next/navigation';
 
 interface SectorProps {
