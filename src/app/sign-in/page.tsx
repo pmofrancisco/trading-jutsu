@@ -1,7 +1,7 @@
 import { toInternalPath } from '@/features/auth/callback-url';
 import { getCurrentUser } from '@/features/auth/data/session';
 import SignInForm from '@/features/auth/ui/sign-in-form';
-import { Alert, Card } from '@heroui/react';
+import { Alert, Card, Typography } from '@heroui/react';
 import { redirect } from 'next/navigation';
 
 interface SignInProps {
@@ -26,14 +26,25 @@ export default async function SignIn({ searchParams }: SignInProps) {
       <Card className="w-full max-w-sm">
         <Card.Header>
           {/*
-           * A plain `<h1>` rather than `Card.Title`: the title is this page's
-           * only heading, and `Card.Title` renders an `<h3>`. Overriding that
-           * takes its `render` prop — a function, which a Server Component
-           * cannot hand to a client component like `Card`.
+           * `Typography.Heading` rather than `Card.Title`: the title is this
+           * page's only heading, and `Card.Title` is hard-wired to an `<h3>` —
+           * the sole override is its `render` prop, a function, which a Server
+           * Component cannot hand to a client component like `Card`. `level`
+           * takes a plain number, so it survives the server/client boundary.
+           *
+           * `text-2xl` because `level` drives both the element and the scale,
+           * and the stock `h1` size (`text-4xl`) wraps to three lines in a
+           * `max-w-sm` card. Tailwind's `utilities` layer outranks the
+           * `components` layer HeroUI styles the heading from, so it wins.
            */}
-          <h1 className="text-2xl font-bold text-center">
+          <Typography.Heading
+            align="center"
+            className="text-2xl"
+            level={1}
+            weight="bold"
+          >
             Sign in to Trading Jutsu
-          </h1>
+          </Typography.Heading>
         </Card.Header>
         <Card.Content className="gap-4">
           {error === 'AccessDenied' && (
