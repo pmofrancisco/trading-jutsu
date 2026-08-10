@@ -1,6 +1,6 @@
 'use client';
 
-import { signIn } from '@/actions';
+import { signIn } from '@/features/auth/actions/sign-in';
 import { Button, Spinner } from '@heroui/react';
 import { useActionState } from 'react';
 

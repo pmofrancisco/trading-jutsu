@@ -1,5 +1,5 @@
 import Header from '@/components/header';
-import PageGuard from '@/components/page-guard';
+import PageGuard from '@/features/auth/ui/page-guard';
 import type { Metadata } from 'next';
 import { SessionProvider } from 'next-auth/react';
 import { Geist, Geist_Mono } from 'next/font/google';

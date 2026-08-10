@@ -1,4 +1,5 @@
-import { prisma } from '@/lib/prisma';
+import { getCurrencyPair } from '@/features/forex/data/currency-pairs';
+import QuoteList from '@/features/forex/ui/quote-list';
 import { paths } from '@/paths';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -11,13 +12,13 @@ interface CurrencyPairProps {
 
 export default async function CurrencyPair({ params }: CurrencyPairProps) {
   const { id } = await params;
+  const currencyPairId = Number(id);
 
-  const currencyPair = await prisma.forexCurrencyPair.findFirst({
-    where: {
-      id: parseInt(id),
-    },
-    include: { quotes: true },
-  });
+  if (!Number.isInteger(currencyPairId)) {
+    notFound();
+  }
+
+  const currencyPair = await getCurrencyPair(currencyPairId);
 
   if (!currencyPair) {
     notFound();
@@ -30,22 +31,7 @@ export default async function CurrencyPair({ params }: CurrencyPairProps) {
         {currencyPair.baseCurrency}/{currencyPair.quoteCurrency}
       </h1>
       <h2>Quotes</h2>
-      <ul>
-        {currencyPair.quotes.map((quote) => (
-          <li key={quote.id}>
-            <div>{quote.quoteDate.toLocaleDateString()}</div>
-            <div>{quote.open}</div>
-            <div>{quote.high}</div>
-            <div>{quote.low}</div>
-            <div>{quote.close}</div>
-          </li>
-        ))}
-      </ul>
+      <QuoteList quotes={currencyPair.quotes} />
     </div>
   );
-}
-
-export async function generateStaticParams() {
-  const currencyPairs = await prisma.forexCurrencyPair.findMany();
-  return currencyPairs.map((pair) => ({ id: pair.id.toString() }));
 }

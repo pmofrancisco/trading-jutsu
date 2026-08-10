@@ -1,6 +1,6 @@
 'use client';
 
-import { signOut } from '@/actions';
+import { signOut } from '@/features/auth/actions/sign-out';
 import { paths } from '@/paths';
 import { Bars } from '@gravity-ui/icons';
 import { Avatar, Button, Drawer, Popover } from '@heroui/react';

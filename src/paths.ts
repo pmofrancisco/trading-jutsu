@@ -16,6 +16,8 @@ export const paths = {
       currencyPairList: () => '/admin/forex/currency-pairs',
     },
     pse: {
+      sector: (id: number) => `/admin/pse/sectors/${id}`,
+      sectorCreate: () => '/admin/pse/sectors/new',
       sectorList: () => '/admin/pse/sectors',
     },
   },
