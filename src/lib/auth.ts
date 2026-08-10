@@ -1,31 +1,33 @@
 import 'server-only';
 
+import { paths } from '@/paths';
 import NextAuth from 'next-auth';
-import Github from 'next-auth/providers/github';
+import GitHub from 'next-auth/providers/github';
 
-const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
-const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
+/**
+ * The whole allowlist: this app has exactly one user. Read at call time rather
+ * than at module scope so a missing value fails the check instead of crashing
+ * the build.
+ */
+export function isAllowedEmail(email: string | null | undefined): boolean {
+  const adminEmail = process.env.ADMIN_EMAIL;
 
-if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET) {
-  throw new Error('Missing github oauth credentials');
+  return Boolean(adminEmail) && email === adminEmail;
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  providers: [
-    Github({
-      clientId: GITHUB_CLIENT_ID,
-      clientSecret: GITHUB_CLIENT_SECRET,
-    }),
-  ],
+  // Credentials come from AUTH_GITHUB_ID / AUTH_GITHUB_SECRET.
+  providers: [GitHub],
+  pages: {
+    signIn: paths.signIn(),
+    // Sends `AccessDenied` back to our own page instead of Auth.js's default
+    // error screen at /api/auth/error.
+    error: paths.signIn(),
+  },
   callbacks: {
-    signIn: async ({ user }) => {
-      const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
-
-      if (!ADMIN_EMAIL) {
-        throw new Error('Missing admin email');
-      }
-
-      return user?.email === ADMIN_EMAIL;
-    },
+    // Turns away a non-allowlisted account at the door. This is not the
+    // authorization boundary — `requireUser()` re-checks on every request, so
+    // an already-issued token cannot outlive its access.
+    signIn: ({ user }) => isAllowedEmail(user.email),
   },
 });

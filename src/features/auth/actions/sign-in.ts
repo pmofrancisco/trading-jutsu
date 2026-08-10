@@ -1,9 +1,11 @@
 'use server';
 
+import { toInternalPath } from '@/features/auth/callback-url';
 import { signIn as nextAuthSignIn } from '@/lib/auth';
-import { paths } from '@/paths';
 
-export async function signIn(): Promise<boolean> {
-  await nextAuthSignIn('github', { redirectTo: paths.home() });
-  return true;
+export async function signIn(formData: FormData): Promise<void> {
+  // Never returns: `nextAuthSignIn` throws a redirect to GitHub.
+  await nextAuthSignIn('github', {
+    redirectTo: toInternalPath(formData.get('callback-url')),
+  });
 }

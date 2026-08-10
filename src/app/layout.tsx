@@ -1,7 +1,4 @@
-import Header from '@/components/header';
-import PageGuard from '@/features/auth/ui/page-guard';
 import type { Metadata } from 'next';
-import { SessionProvider } from 'next-auth/react';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 
@@ -45,7 +42,7 @@ const applyStoredTheme = `
 })();
 `;
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -59,12 +56,7 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <script dangerouslySetInnerHTML={{ __html: applyStoredTheme }} />
-        <SessionProvider>
-          <PageGuard>
-            <Header />
-            <div className="p-4">{children}</div>
-          </PageGuard>
-        </SessionProvider>
+        {children}
       </body>
     </html>
   );

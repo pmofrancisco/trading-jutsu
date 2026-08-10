@@ -2,15 +2,19 @@
 
 import ThemeSwitch from '@/components/theme-switch';
 import { signOut } from '@/features/auth/actions/sign-out';
+import type { SessionUser } from '@/features/auth/data/session';
 import { paths } from '@/paths';
 import { Bars } from '@gravity-ui/icons';
 import { Avatar, Button, Drawer, Popover } from '@heroui/react';
-import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useState } from 'react';
 
-export default function Header() {
-  const session = useSession();
+/**
+ * Client-only for the drawer and popover state. The user arrives as a prop from
+ * the server rather than from `useSession()`, so there is no client-side
+ * session fetch and no flash of signed-out UI on first paint.
+ */
+export default function Header({ user }: { user: SessionUser }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -71,15 +75,12 @@ export default function Header() {
         <Popover>
           <Button variant="ghost" isIconOnly>
             <Avatar className="size-8">
-              <Avatar.Image
-                src={session.data?.user?.image || ''}
-                alt={session.data?.user?.name || 'User'}
-              />
+              <Avatar.Image src={user.image ?? ''} alt={user.name ?? 'User'} />
             </Avatar>
           </Button>
           <Popover.Content className="p-4">
-            <div className="font-bold">{session.data?.user?.name}</div>
-            <div className="mb-3">{session.data?.user?.email}</div>
+            <div className="font-bold">{user.name}</div>
+            <div className="mb-3">{user.email}</div>
             <form action={signOut} className="w-full">
               <Button className="w-full" type="submit" variant="outline">
                 Sign out
