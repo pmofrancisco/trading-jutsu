@@ -1,0 +1,8 @@
+# Prisma Client output (see generator block in prisma/schema.prisma).
+src/generated/
+
+# Build output.
+.next/
+out/
+build/
+next-env.d.ts
