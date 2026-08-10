@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+import { getSector } from '@/features/pse/data/sectors';
 import { notFound } from 'next/navigation';
 
 interface SectorProps {
@@ -9,12 +9,13 @@ interface SectorProps {
 
 export default async function Sector(props: SectorProps) {
   const { id } = await props.params;
+  const sectorId = Number(id);
 
-  const sector = await prisma.pseSector.findFirst({
-    where: {
-      id: parseInt(id),
-    },
-  });
+  if (!Number.isInteger(sectorId)) {
+    notFound();
+  }
+
+  const sector = await getSector(sectorId);
 
   if (!sector) {
     notFound();

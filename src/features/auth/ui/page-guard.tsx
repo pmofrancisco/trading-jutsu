@@ -3,6 +3,11 @@
 import { useSession } from 'next-auth/react';
 import SignInButton from './sign-in-button';
 
+/**
+ * Presentation only: swaps the app shell for a sign-in prompt. This is not an
+ * authorization boundary — every data function enforces access on the server
+ * via `requireUser()`.
+ */
 export default function PageGuard({ children }: { children: React.ReactNode }) {
   const session = useSession();
 
