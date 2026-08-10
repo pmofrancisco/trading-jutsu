@@ -1,5 +1,6 @@
 'use client';
 
+import ThemeSwitch from '@/components/theme-switch';
 import { signOut } from '@/features/auth/actions/sign-out';
 import { paths } from '@/paths';
 import { Bars } from '@gravity-ui/icons';
@@ -13,7 +14,7 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="flex p-2 border-b border-b-gray-100 items-center justify-between">
+    <div className="flex p-2 border-b border-b-border items-center justify-between">
       <div className="flex items-center gap-2">
         <Drawer isOpen={isOpen} onOpenChange={setIsOpen}>
           <Button isIconOnly variant="ghost">
@@ -41,7 +42,7 @@ export default function Header() {
                   >
                     PH Stocks
                   </Link>
-                  <div className="font-bold border-t border-gray-100 pt-2">
+                  <div className="font-bold border-t border-border pt-2">
                     Admin
                   </div>
                   <Link
@@ -65,25 +66,28 @@ export default function Header() {
           Trading Jutsu
         </Link>
       </div>
-      <Popover>
-        <Button variant="ghost" isIconOnly>
-          <Avatar className="size-8">
-            <Avatar.Image
-              src={session.data?.user?.image || ''}
-              alt={session.data?.user?.name || 'User'}
-            />
-          </Avatar>
-        </Button>
-        <Popover.Content className="p-4">
-          <div className="font-bold">{session.data?.user?.name}</div>
-          <div className="mb-3">{session.data?.user?.email}</div>
-          <form action={signOut} className="w-full">
-            <Button className="w-full" type="submit" variant="outline">
-              Sign out
-            </Button>
-          </form>
-        </Popover.Content>
-      </Popover>
+      <div className="flex items-center gap-3">
+        <ThemeSwitch />
+        <Popover>
+          <Button variant="ghost" isIconOnly>
+            <Avatar className="size-8">
+              <Avatar.Image
+                src={session.data?.user?.image || ''}
+                alt={session.data?.user?.name || 'User'}
+              />
+            </Avatar>
+          </Button>
+          <Popover.Content className="p-4">
+            <div className="font-bold">{session.data?.user?.name}</div>
+            <div className="mb-3">{session.data?.user?.email}</div>
+            <form action={signOut} className="w-full">
+              <Button className="w-full" type="submit" variant="outline">
+                Sign out
+              </Button>
+            </form>
+          </Popover.Content>
+        </Popover>
+      </div>
     </div>
   );
 }
