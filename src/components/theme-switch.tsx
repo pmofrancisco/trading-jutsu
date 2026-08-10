@@ -30,6 +30,10 @@ export default function ThemeSwitch() {
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
       isSelected={isDark}
       onChange={(selected) => setTheme(selected ? 'dark' : 'light')}
+      // The checked track defaults to the blue accent. Override it to a neutral
+      // gray via the tokens `.switch` exposes for this; the hover token has to
+      // go too, or hovering flashes the accent back.
+      className="[--switch-control-bg-checked:var(--color-segment)] [--switch-control-bg-checked-hover:var(--color-segment)]"
     >
       <Switch.Control>
         {/*
@@ -38,7 +42,12 @@ export default function ThemeSwitch() {
          * obvious place to click — is dead and only the bare track responds.
          * Clicks fall through to the control, which covers the same area.
          */}
-        <Switch.Thumb className="items-center justify-center pointer-events-none">
+        {/*
+         * `text-black`: when checked, HeroUI recolors the thumb's contents to
+         * the accent, which would leave a blue moon on the gray track. The
+         * utility wins on layer order, not specificity.
+         */}
+        <Switch.Thumb className="items-center justify-center pointer-events-none text-black">
           {isDark ? (
             <Moon width={11} height={11} />
           ) : (
