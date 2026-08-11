@@ -17,19 +17,28 @@ src/
     data/               'server-only': authorization + queries + DTOs
     actions/            'use server': parse input, delegate to data/, revalidate
     ui/                 components belonging to this feature
-  lib/                  framework/infra singletons (prisma, auth, form-state)
+  lib/                  framework/infra singletons (db clients, auth, form-state)
   paths.ts              the only place route strings are written
 ```
 
 Rules:
 
-- **Only `features/*/data/` may import `@/lib/prisma`.** Nothing in `app/`,
-  `components/`, or `ui/` touches the database.
+- **Only `features/*/data/` may import a database client** — `@/lib/prisma` or
+  `@/lib/ph-stocks-db`. Nothing in `app/`, `components/`, or `ui/` touches a
+  database.
+- **There are two databases.** `@/lib/prisma` is this app's own, the one it
+  owns and migrates. `@/lib/ph-stocks-db` is a read-only `pg` pool over the PH
+  market data (`market_data`, `PH_STOCKS_DATABASE_URL`) — a second instance
+  owned and migrated by another application. It is a plain pool rather than a
+  second Prisma client because Prisma cannot hold two datasources in one
+  schema, and a generated model would invite `prisma migrate` to enforce our
+  schema against a table we do not control. Never write to it.
 - **Every data function calls `requireUser()` first.** Server Actions are
   reachable by direct POST, so the page-level check is not the boundary — the
   data layer is. `PageGuard` is presentation only.
-- **Data functions return DTOs from `data/dto.ts`, never Prisma models.** Use
-  Prisma `select` to fetch only the DTO's fields.
+- **Data functions return DTOs from `data/dto.ts`, never Prisma models or raw
+  query rows.** Use Prisma `select` to fetch only the DTO's fields; with raw
+  SQL, map the rows to the DTO inside the data function.
 - **Actions stay thin**: validate `FormData` with Zod, call one data function,
   then `revalidatePath` / `redirect`. Wrap the call in `try/catch` and start the
   catch with `unstable_rethrow(err)` so framework control-flow errors pass
