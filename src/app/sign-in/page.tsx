@@ -1,8 +1,34 @@
 import { toInternalPath } from '@/features/auth/callback-url';
 import { getCurrentUser } from '@/features/auth/data/session';
 import SignInForm from '@/features/auth/ui/sign-in-form';
+import { paths } from '@/paths';
 import { Alert, Card, Typography } from '@heroui/react';
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+
+/**
+ * The only page a crawler can reach, so this is the entry Google will show for
+ * the site. The canonical matters more than usual: `proxy.ts` sends visitors
+ * here with a `callbackUrl`, and Auth.js with an `error`, so the same page is
+ * reachable at many query strings that would otherwise be indexed separately.
+ */
+export const metadata: Metadata = {
+  title: 'Sign in',
+  description:
+    'Sign in to Trading Jutsu, a personal markets dashboard for Philippine Stock Exchange indices, crypto and forex.',
+  alternates: { canonical: paths.signIn() },
+  // `url` overrides the root layout's site-root URL so the link preview and the
+  // canonical above name the same page rather than disagreeing. `type` and
+  // `siteName` are repeated because a nested metadata field *replaces* the
+  // parent segment's object outright instead of merging into it — without them
+  // this page would ship no `og:type` or `og:site_name` at all. (`title` and
+  // `description` are the exception: Next backfills those from the page's own.)
+  openGraph: {
+    type: 'website',
+    siteName: 'Trading Jutsu',
+    url: paths.signIn(),
+  },
+};
 
 interface SignInProps {
   searchParams: Promise<{ callbackUrl?: string; error?: string }>;
