@@ -37,5 +37,11 @@ export function proxy(request: NextRequest) {
 export const config = {
   // `/api/auth` is excluded because the OAuth callback arrives before the
   // session cookie exists — proxying it would break sign-in itself.
-  matcher: ['/((?!api/auth|_next/static|_next/image|favicon.ico).*)'],
+  //
+  // `robots.txt` and `sitemap.xml` are excluded because a crawler carries no
+  // session cookie: without this they would be redirected to the sign-in page
+  // like any other request, and Google would never read either one.
+  matcher: [
+    '/((?!api/auth|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)',
+  ],
 };

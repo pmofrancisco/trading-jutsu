@@ -1,5 +1,16 @@
 import Header from '@/components/header';
 import { requireUser } from '@/features/auth/data/session';
+import type { Metadata } from 'next';
+
+/**
+ * Defence in depth, not the reason these pages stay unindexed — `proxy.ts`
+ * turns a crawler away long before it renders one. This keeps them out of the
+ * index anyway if that gate is ever loosened. Metadata in a segment overrides
+ * the same field in the root layout.
+ */
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 /**
  * Wraps every route that requires a signed-in user. Layouts do not re-render on
