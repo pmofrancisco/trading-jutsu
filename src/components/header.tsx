@@ -46,21 +46,6 @@ export default function Header({ user }: { user: SessionUser }) {
                   >
                     PH Stocks
                   </Link>
-                  <div className="font-bold border-t border-border pt-2">
-                    Admin
-                  </div>
-                  <Link
-                    href={paths.admin.forex.currencyPairList()}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Forex Currency Pairs
-                  </Link>
-                  <Link
-                    href={paths.admin.phStocks.sectorList()}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    PH Stocks Sectors
-                  </Link>
                 </Drawer.Body>
               </Drawer.Dialog>
             </Drawer.Content>

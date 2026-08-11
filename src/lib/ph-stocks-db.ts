@@ -5,13 +5,12 @@ import { Pool } from 'pg';
 /**
  * A read-only connection to the PH market data database.
  *
- * This is a second Postgres instance, separate from `DATABASE_URL`. Prisma
- * cannot hold two datasources in one schema, and `market_data` is owned and
- * migrated by another application — so this app reaches it with a plain pool
- * rather than a generated client that would invite `prisma migrate` to enforce
- * our schema against a table we do not control.
+ * `market_data` is owned and migrated by another application, so this app
+ * reaches it with a plain pool and hand-written SQL rather than a generated
+ * client — nothing here should be able to enforce a schema against a table we
+ * do not control.
  *
- * Only a feature's data layer may import this, exactly as with `@/lib/prisma`.
+ * Only a feature's data layer may import this.
  */
 
 /**
