@@ -2,8 +2,8 @@
 
 import Mark from '@/components/mark';
 import ThemeSwitch from '@/components/theme-switch';
-import { signOut } from '@/features/auth/actions/sign-out';
 import type { SessionUser } from '@/features/auth/data/session';
+import UserMenu from '@/features/auth/ui/user-menu';
 import { paths } from '@/paths';
 import {
   ArrowRightArrowLeft,
@@ -11,9 +11,8 @@ import {
   ChartLine,
   Cubes3,
   House,
-  Person,
 } from '@gravity-ui/icons';
-import { Avatar, Button, Drawer, Popover } from '@heroui/react';
+import { Button, Drawer } from '@heroui/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -95,31 +94,13 @@ function NavLink({
 }
 
 /**
- * The first letter of the first two words of a name — "Paul Michael Francisco"
- * becomes "PM". Empty when there is no name to read, which lets the caller fall
- * back to an icon rather than rendering an empty circle.
- */
-function initials(name: string | null | undefined): string {
-  if (!name) return '';
-
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => word[0]?.toUpperCase() ?? '')
-    .join('');
-}
-
-/**
- * Client-only for the drawer and popover state. The user arrives as a prop from
- * the server rather than from `useSession()`, so there is no client-side
- * session fetch and no flash of signed-out UI on first paint.
+ * Client-only for the drawer state and the active-route highlight. The user
+ * arrives as a prop from the server rather than from `useSession()`, so there
+ * is no client-side session fetch and no flash of signed-out UI on first paint.
  */
 export default function Header({ user }: { user: SessionUser }) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
-
-  const userInitials = initials(user.name);
 
   return (
     // `sticky`: the PH Stocks grid is taller than the viewport, and the
@@ -202,35 +183,7 @@ export default function Header({ user }: { user: SessionUser }) {
         </div>
         <div className="flex items-center gap-3">
           <ThemeSwitch />
-          <Popover>
-            <Button
-              variant="ghost"
-              isIconOnly
-              aria-label={`Account: ${user.name ?? user.email ?? 'signed in'}`}
-            >
-              <Avatar className="size-8">
-                {/*
-                 * HeroUI's Avatar is Radix-based: the image unmounts when `src`
-                 * is empty or fails to load, and the fallback takes its place.
-                 * Without a fallback a GitHub account with no picture rendered
-                 * an empty circle.
-                 */}
-                <Avatar.Image src={user.image ?? ''} alt="" />
-                <Avatar.Fallback>
-                  {userInitials || <Person aria-hidden />}
-                </Avatar.Fallback>
-              </Avatar>
-            </Button>
-            <Popover.Content className="p-4">
-              <div className="font-bold">{user.name}</div>
-              <div className="mb-3">{user.email}</div>
-              <form action={signOut} className="w-full">
-                <Button className="w-full" type="submit" variant="outline">
-                  Sign out
-                </Button>
-              </form>
-            </Popover.Content>
-          </Popover>
+          <UserMenu user={user} />
         </div>
       </div>
     </header>
