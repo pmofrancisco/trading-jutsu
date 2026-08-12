@@ -29,7 +29,9 @@ export default async function PrivateLayout({
   return (
     <>
       <Header user={user} />
-      <div className="p-4">{children}</div>
+      {/* The landmark that pairs with the `<header>` and `<nav>` inside it, so
+       * a screen reader can skip straight to the page's own content. */}
+      <main className="p-4">{children}</main>
     </>
   );
 }
