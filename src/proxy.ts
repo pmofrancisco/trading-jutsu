@@ -38,10 +38,13 @@ export const config = {
   // `/api/auth` is excluded because the OAuth callback arrives before the
   // session cookie exists — proxying it would break sign-in itself.
   //
-  // `robots.txt` and `sitemap.xml` are excluded because a crawler carries no
-  // session cookie: without this they would be redirected to the sign-in page
-  // like any other request, and Google would never read either one.
+  // `icon`, `robots.txt` and `sitemap.xml` are excluded because the client
+  // asking for them carries no session cookie: without this they would be
+  // redirected to the sign-in page like any other request, and Google would
+  // never read any of them. `icon` is the generated favicon route (`app/
+  // icon.tsx`) — a browser fetches it before there is a session, on the
+  // sign-in page itself.
   matcher: [
-    '/((?!api/auth|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)',
+    '/((?!api/auth|_next/static|_next/image|icon|favicon.ico|robots.txt|sitemap.xml).*)',
   ],
 };
