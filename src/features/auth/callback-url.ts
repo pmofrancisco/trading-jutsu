@@ -1,12 +1,31 @@
 import { paths } from '@/paths';
 
 /**
+ * Whether a path leads back to the sign-in page.
+ *
+ * Matched exactly, or up to a query string — not by prefix, so a later route
+ * such as `/sign-in-help` is not swept up with it.
+ */
+function isSignInPath(path: string): boolean {
+  const signIn = paths.signIn();
+
+  return path === signIn || path.startsWith(`${signIn}?`);
+}
+
+/**
  * Narrows an untrusted `callbackUrl` down to a path inside this app.
  *
  * The value reaches us through the query string and a hidden form field, so it
  * is attacker-controlled: without this, a crafted sign-in link could bounce the
  * user to another origin after authenticating. `//evil.com` and `/\evil.com`
  * are rejected too — browsers read both as protocol-relative URLs.
+ *
+ * The sign-in page is rejected as well. What this function returns is where
+ * somebody goes *after* signing in, and that is never the page they just came
+ * from: `sign-in/page` redirects an authenticated visitor to it, so a value of
+ * `/sign-in` is a page that redirects to itself. Signing out is enough to
+ * produce one — `signOut({ redirectTo: paths.signIn() })` leaves that URL in
+ * Auth.js's callback cookie, which `toInternalPathFromUrl` then reads back.
  */
 export function toInternalPath(value: unknown): string {
   if (typeof value !== 'string' || !value.startsWith('/')) {
@@ -14,6 +33,10 @@ export function toInternalPath(value: unknown): string {
   }
 
   if (value.startsWith('//') || value.startsWith('/\\')) {
+    return paths.home();
+  }
+
+  if (isSignInPath(value)) {
     return paths.home();
   }
 
