@@ -3,21 +3,7 @@ import 'server-only';
 import { requireUser } from '@/features/auth/data/session';
 import { phStocksDb } from '@/lib/ph-stocks-db';
 import type { IndexPerformance } from './dto';
-
-/**
- * The PSE composite index followed by the six sector indices, in the order they
- * are displayed. `symbol` is what `market_data` stores; `name` is what the PSE
- * calls it.
- */
-const PSE_INDICES = [
-  { symbol: 'PSEI', name: 'PSE Composite Index' },
-  { symbol: 'FINA', name: 'Financials' },
-  { symbol: 'INDU', name: 'Industrial' },
-  { symbol: 'HOLD', name: 'Holding Firms' },
-  { symbol: 'PROP', name: 'Property' },
-  { symbol: 'SERV', name: 'Services' },
-  { symbol: 'MINI', name: 'Mining & Oil' },
-] as const;
+import { PSE_INDEX_SYMBOLS, PSE_INDICES } from './pse-indices';
 
 /**
  * Picks two bars per symbol: the most recent one, and the last one before the
@@ -74,7 +60,7 @@ export async function listIndexPerformance(): Promise<IndexPerformance[]> {
 
   const { rows } = await phStocksDb().query<PerformanceRow>(
     YTD_PERFORMANCE_SQL,
-    [PSE_INDICES.map((index) => index.symbol)],
+    [PSE_INDEX_SYMBOLS],
   );
 
   const bySymbol = new Map(rows.map((row) => [row.symbol, row]));
