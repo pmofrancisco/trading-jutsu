@@ -1,6 +1,7 @@
 'use client';
 
 import Mark from '@/components/mark';
+import NavLink, { isActive } from '@/components/nav-link';
 import ThemeSwitch from '@/components/theme-switch';
 import type { SessionUser } from '@/features/auth/data/session';
 import UserMenu from '@/features/auth/ui/user-menu';
@@ -9,87 +10,140 @@ import {
   ArrowRightArrowLeft,
   Bars,
   ChartLine,
+  ChevronDown,
   Cubes3,
   House,
 } from '@gravity-ui/icons';
-import { Button, Drawer } from '@heroui/react';
+import { Button, Drawer, Popover } from '@heroui/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+
+interface NavItem {
+  href: string;
+  label: string;
+  Icon: (props: React.SVGProps<SVGSVGElement>) => React.JSX.Element;
+  /**
+   * The section's own pages, if it has more than the one at `href`. Named
+   * `pages` rather than `children` so it is never mistaken for React's own
+   * prop, which the components below also take.
+   */
+  pages?: { href: string; label: string }[];
+}
 
 /**
  * The navigation, in render order. Every `href` comes from `paths` — see the
  * note there on route strings living in exactly one place. The icons render at
  * 16px with `fill: currentColor` by default, so they inherit the row's text
  * colour and need no sizing of their own.
+ *
+ * A section's pages are nested under it rather than promoted to the top level:
+ * the bar has room for a handful of items, and PH Stocks is the first section
+ * with pages of its own.
  */
-const navItems = [
+const navItems: NavItem[] = [
   { href: paths.home(), label: 'Home', Icon: House },
   { href: paths.crypto.index(), label: 'Crypto', Icon: Cubes3 },
   { href: paths.forex.index(), label: 'Forex', Icon: ArrowRightArrowLeft },
-  { href: paths.phStocks.index(), label: 'PH Stocks', Icon: ChartLine },
+  {
+    href: paths.phStocks.index(),
+    label: 'PH Stocks',
+    Icon: ChartLine,
+    pages: [
+      {
+        href: paths.phStocks.indicesPerformance(),
+        label: 'Indices Performance',
+      },
+    ],
+  },
 ];
 
 /**
- * Home is `/`, the prefix of every other route, so it alone has to match
- * exactly. The rest also match their subpaths, keeping the section highlighted
- * once these routes grow children.
- */
-function isActive(pathname: string, href: string): boolean {
-  if (href === paths.home()) return pathname === href;
-
-  return pathname === href || pathname.startsWith(`${href}/`);
-}
-
-/**
  * The focus ring HeroUI's own controls draw, as utilities. A bare `<a>` gets
- * none of a `Button`'s styling, so without this the links in this header are
- * the only interactive elements in the app with a browser-default focus
- * outline.
+ * none of a `Button`'s styling, so without this the brand link would be the
+ * only interactive element in the app with a browser-default focus outline.
  */
 const focusRing =
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus';
 
 /**
- * One row, rendered in both navigations — the drawer stacks these, the desktop
- * bar lays them out in a line, and neither needs its own copy of the markup.
- * `onNavigate` is how the drawer closes itself on a click; the desktop bar has
- * nothing to close and omits it.
+ * A section in the desktop bar, as a link plus a disclosure for its pages.
+ *
+ * The two are separate controls on purpose. Turning the section itself into the
+ * menu's trigger is the more common pattern, but it would cost `/ph-stocks` its
+ * only link in the app — a keyboard or screen-reader user would have to open a
+ * menu to reach a page that is perfectly reachable on its own. Nesting a button
+ * inside the `<a>` is not an option either; interactive elements cannot nest,
+ * so they sit side by side.
+ *
+ * A `Popover` of real `<Link>`s rather than a `Dropdown`, for the same reason
+ * `UserMenu` is a dialog: React Aria's menu items navigate through its own
+ * router integration, which this app does not install, so their `href` would
+ * cost a full page load where `next/link` navigates on the client.
  */
-function NavLink({
+function SectionNavItem({
   href,
   label,
   Icon,
-  isCurrent,
-  onNavigate,
+  pages,
+  pathname,
 }: {
   href: string;
   label: string;
   Icon: (props: React.SVGProps<SVGSVGElement>) => React.JSX.Element;
-  isCurrent: boolean;
-  onNavigate?: () => void;
+  pages: { href: string; label: string }[];
+  pathname: string;
 }) {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <Link
-      href={href}
-      // Conveys the highlight to a screen reader, which cannot see the
-      // background colour.
-      aria-current={isCurrent ? 'page' : undefined}
-      onClick={onNavigate}
-      className={`flex items-center gap-3 rounded-md px-3 py-2 transition-colors ${focusRing} ${
-        isCurrent
-          ? 'bg-accent-soft text-accent-soft-foreground font-medium'
-          : 'text-muted hover:bg-surface-hover hover:text-foreground'
-      }`}
-    >
-      {/*
-       * `aria-hidden`: the label already names the destination. `shrink-0`: a
-       * flex child may be shrunk past its `width` attribute, which would squash
-       * the icon rather than wrap the label.
-       */}
-      <Icon aria-hidden className="shrink-0" />
-      {label}
-    </Link>
+    <div className="flex items-center">
+      <NavLink href={href} label={label} Icon={Icon} pathname={pathname} />
+      <Popover isOpen={isOpen} onOpenChange={setIsOpen}>
+        {/*
+         * `aria-label`: an icon-only `Button` adds no accessible name of its
+         * own, and "button" alone would not say which section it opens. React
+         * Aria supplies the `aria-expanded`/`aria-haspopup` pairing.
+         */}
+        <Button
+          isIconOnly
+          size="sm"
+          variant="ghost"
+          aria-label={`${label} pages`}
+        >
+          <ChevronDown
+            aria-hidden
+            className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          />
+        </Button>
+        {/*
+         * The trigger is the chevron, so the panel is anchored to it: `start`
+         * lines their left edges up and lets the panel open rightwards, back
+         * under the label. `min-w` keeps it from collapsing to the width of the
+         * chevron it hangs from.
+         */}
+        <Popover.Content className="p-1 min-w-52" placement="bottom start">
+          {/*
+           * The panel is portalled out of the header, so it carries its own
+           * landmark rather than relying on the "Main" `<nav>` it renders from.
+           */}
+          <nav aria-label={label}>
+            <ul className="flex flex-col gap-1">
+              {pages.map((page) => (
+                <li key={page.href}>
+                  <NavLink
+                    href={page.href}
+                    label={page.label}
+                    pathname={pathname}
+                    onNavigate={() => setIsOpen(false)}
+                  />
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </Popover.Content>
+      </Popover>
+    </div>
   );
 }
 
@@ -132,15 +186,37 @@ export default function Header({ user }: { user: SessionUser }) {
                     <Drawer.Body>
                       <nav aria-label="Main">
                         <ul className="flex flex-col gap-1">
-                          {navItems.map(({ href, label, Icon }) => (
+                          {navItems.map(({ href, label, Icon, pages }) => (
                             <li key={href}>
                               <NavLink
                                 href={href}
                                 label={label}
                                 Icon={Icon}
-                                isCurrent={isActive(pathname, href)}
+                                pathname={pathname}
                                 onNavigate={() => setIsOpen(false)}
                               />
+                              {/*
+                               * The drawer is already an open panel, so a
+                               * section's pages are nested in place rather than
+                               * behind a second disclosure — one tap to reach
+                               * them instead of two. A nested `<ul>` is what
+                               * conveys the hierarchy to a screen reader; the
+                               * rule and indent are for everyone else.
+                               */}
+                              {pages && (
+                                <ul className="mt-1 ml-5 flex flex-col gap-1 border-l border-l-border pl-2">
+                                  {pages.map((page) => (
+                                    <li key={page.href}>
+                                      <NavLink
+                                        href={page.href}
+                                        label={page.label}
+                                        pathname={pathname}
+                                        onNavigate={() => setIsOpen(false)}
+                                      />
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
                             </li>
                           ))}
                         </ul>
@@ -168,14 +244,24 @@ export default function Header({ user }: { user: SessionUser }) {
            */}
           <nav aria-label="Main" className="hidden sm:block ml-2">
             <ul className="flex items-center gap-1">
-              {navItems.map(({ href, label, Icon }) => (
+              {navItems.map(({ href, label, Icon, pages }) => (
                 <li key={href}>
-                  <NavLink
-                    href={href}
-                    label={label}
-                    Icon={Icon}
-                    isCurrent={isActive(pathname, href)}
-                  />
+                  {pages ? (
+                    <SectionNavItem
+                      href={href}
+                      label={label}
+                      Icon={Icon}
+                      pages={pages}
+                      pathname={pathname}
+                    />
+                  ) : (
+                    <NavLink
+                      href={href}
+                      label={label}
+                      Icon={Icon}
+                      pathname={pathname}
+                    />
+                  )}
                 </li>
               ))}
             </ul>

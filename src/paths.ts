@@ -22,5 +22,6 @@ export const paths = {
   },
   phStocks: {
     index: () => '/ph-stocks',
+    indicesPerformance: () => '/ph-stocks/indices-performance',
   },
 };
