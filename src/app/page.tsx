@@ -1,45 +1,52 @@
-import Header from '@/components/header';
 import PublicHeader from '@/components/public-header';
 import { getCurrentUser } from '@/features/auth/data/session';
 import { paths } from '@/paths';
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 
 /**
- * The site root, and now one of the two routes a crawler can reach — see the
- * note in `sitemap.ts`. Only the canonical is set here: the title, description
- * and Open Graph fields in the root layout already describe this page, since it
- * is the page that layout's `openGraph.url` names.
+ * The site root, and one of the two routes a crawler can reach — see the note in
+ * `sitemap.ts`. Only the canonical is set here: the title, description and Open
+ * Graph fields in the root layout already describe this page, since it is the
+ * page that layout's `openGraph.url` names.
  */
 export const metadata: Metadata = {
   alternates: { canonical: paths.home() },
 };
 
 /**
- * The one page in the app that renders for a visitor with or without a session,
- * so it is also the one page that has to choose its own header.
+ * The landing page a stranger sees, and the mirror of `sign-in`: each sends the
+ * visitor it is not written for to the other side of the sign-in.
  *
  * It sits outside `(private)` — that group's layout calls `requireUser()`, which
  * would redirect the visitor this page exists to serve — so the header and the
  * `<main>` landmark that group provides are composed here instead.
  *
- * `getCurrentUser()` rather than `requireUser()`: a null user is the expected
- * case, not a reason to redirect. Reading the session opts this route into
- * dynamic rendering, which is unavoidable — the two visitors get different
- * headers, so there is no one version of this page to prerender.
+ * Reading the session opts this route into dynamic rendering, which is
+ * unavoidable: whether the page renders at all depends on who is asking.
  */
 export default async function Home() {
   // Deliberately the same check `requireUser()` makes, so a session good enough
-  // for the private routes is a session good enough for the full header.
-  const user = await getCurrentUser();
+  // for the private routes is a session that never stops here. `getCurrentUser()`
+  // rather than `requireUser()`: a null user is this page's whole audience, not
+  // a reason to redirect.
+  //
+  // The check belongs here and not in `proxy.ts`, which only looks for the
+  // presence of a session cookie: a stale or revoked one would send its owner to
+  // `/dashboard`, and from there to `/sign-in?callbackUrl=/dashboard` — the
+  // wrong destination, arrived at by way of a page they were never shown.
+  //
+  // `redirect()` answers with a 307. A permanent one would be cached by the
+  // browser and strand the same visitor on `/dashboard` after they signed out.
+  if (await getCurrentUser()) {
+    redirect(paths.dashboard());
+  }
 
   return (
     <>
-      {/*
-       * A signed-in visitor keeps the navigation and the account menu they have
-       * everywhere else; `<Header />` needs a `SessionUser`, and `PublicHeader`
-       * is what is left of it once there is no session to render.
-       */}
-      {user ? <Header user={user} /> : <PublicHeader />}
+      {/* `PublicHeader` unconditionally: past the redirect above, nobody
+       * reading this page has a session for `<Header />` to render. */}
+      <PublicHeader />
       {/* The landmark that pairs with the `<header>` and `<nav>` inside it, so
        * a screen reader can skip straight to the page's own content. Matches
        * `(private)/layout` so the page does not shift when the header does. */}

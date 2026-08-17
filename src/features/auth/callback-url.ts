@@ -1,34 +1,36 @@
 import { paths } from '@/paths';
 
 /**
- * Whether a path leads back to the sign-in page.
+ * Whether a path leads to `route`, whatever query string trails it.
  *
- * Matched exactly, or up to a query string — not by prefix, so a later route
- * such as `/sign-in-help` is not swept up with it.
+ * Matched exactly, or up to the `?` — never by prefix. A prefix test would sweep
+ * a later route such as `/sign-in-help` in with `/sign-in`, and for `/` it would
+ * match the entire app.
  */
-function isSignInPath(path: string): boolean {
-  const signIn = paths.signIn();
-
-  return path === signIn || path.startsWith(`${signIn}?`);
+function isPath(route: string, path: string): boolean {
+  return path === route || path.startsWith(`${route}?`);
 }
 
 /**
  * Narrows an untrusted `callbackUrl` down to a path inside this app, falling
- * back to the dashboard. Not to `/`: that is the public landing page, and
- * finishing a sign-in only to arrive at the page for people who have not signed
- * in would read as the sign-in having failed.
+ * back to the dashboard.
  *
  * The value reaches us through the query string and a hidden form field, so it
  * is attacker-controlled: without this, a crafted sign-in link could bounce the
  * user to another origin after authenticating. `//evil.com` and `/\evil.com`
  * are rejected too — browsers read both as protocol-relative URLs.
  *
- * The sign-in page is rejected as well. What this function returns is where
- * somebody goes *after* signing in, and that is never the page they just came
- * from: `sign-in/page` redirects an authenticated visitor to it, so a value of
- * `/sign-in` is a page that redirects to itself. Signing out is enough to
- * produce one — `signOut({ redirectTo: paths.signIn() })` leaves that URL in
- * Auth.js's callback cookie, which `toInternalPathFromUrl` then reads back.
+ * The two public pages are rejected as destinations, query string and all. What
+ * this function returns is where somebody goes *after* signing in, and neither
+ * page will hold them once they have: `sign-in/page` redirects an authenticated
+ * visitor onward, and so does `app/page`. Either value therefore describes the
+ * same journey — a page that only forwards them to the dashboard the fallback
+ * would have named outright, one wasted round trip later.
+ *
+ * Ordinary use produces both. Signing out leaves `/sign-in` in Auth.js's
+ * callback cookie, which `toInternalPathFromUrl` reads back; `/` is what that
+ * cookie holds whenever Auth.js fell back to the bare site origin, whose
+ * pathname is exactly that.
  */
 export function toInternalPath(value: unknown): string {
   if (typeof value !== 'string' || !value.startsWith('/')) {
@@ -39,7 +41,7 @@ export function toInternalPath(value: unknown): string {
     return paths.dashboard();
   }
 
-  if (isSignInPath(value)) {
+  if (isPath(paths.signIn(), value) || isPath(paths.home(), value)) {
     return paths.dashboard();
   }
 
