@@ -244,7 +244,7 @@ export default function Header({ user }: { user: SessionUser }) {
             }
             className={`flex items-center gap-2 rounded-md px-2 py-1 font-bold tracking-tight transition-colors hover:bg-surface-hover ${focusRing}`}
           >
-            <Mark className="size-5 shrink-0 text-accent" />
+            <Mark className="size-5 shrink-0" />
             Trading Jutsu
           </Link>
           {/*
