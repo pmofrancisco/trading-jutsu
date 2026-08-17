@@ -13,7 +13,10 @@ function isSignInPath(path: string): boolean {
 }
 
 /**
- * Narrows an untrusted `callbackUrl` down to a path inside this app.
+ * Narrows an untrusted `callbackUrl` down to a path inside this app, falling
+ * back to the dashboard. Not to `/`: that is the public landing page, and
+ * finishing a sign-in only to arrive at the page for people who have not signed
+ * in would read as the sign-in having failed.
  *
  * The value reaches us through the query string and a hidden form field, so it
  * is attacker-controlled: without this, a crafted sign-in link could bounce the
@@ -29,15 +32,15 @@ function isSignInPath(path: string): boolean {
  */
 export function toInternalPath(value: unknown): string {
   if (typeof value !== 'string' || !value.startsWith('/')) {
-    return paths.home();
+    return paths.dashboard();
   }
 
   if (value.startsWith('//') || value.startsWith('/\\')) {
-    return paths.home();
+    return paths.dashboard();
   }
 
   if (isSignInPath(value)) {
-    return paths.home();
+    return paths.dashboard();
   }
 
   return value;
@@ -66,7 +69,7 @@ export const CALLBACK_URL_COOKIE_NAMES = [
  */
 export function toInternalPathFromUrl(value: unknown): string {
   if (typeof value !== 'string') {
-    return paths.home();
+    return paths.dashboard();
   }
 
   try {
@@ -75,6 +78,6 @@ export function toInternalPathFromUrl(value: unknown): string {
     return toInternalPath(`${pathname}${search}`);
   } catch {
     // Not an absolute URL, so there is no path in it to trust.
-    return paths.home();
+    return paths.dashboard();
   }
 }

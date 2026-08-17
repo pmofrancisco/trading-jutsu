@@ -12,7 +12,7 @@ import {
   ChartLine,
   ChevronDown,
   Cubes3,
-  House,
+  LayoutCells,
 } from '@gravity-ui/icons';
 import { Button, Drawer, Popover } from '@heroui/react';
 import Link from 'next/link';
@@ -40,9 +40,13 @@ interface NavItem {
  * A section's pages are nested under it rather than promoted to the top level:
  * the bar has room for a handful of items, and PH Stocks is the first section
  * with pages of its own.
+ *
+ * `/` is deliberately absent. It is the public landing page, and this header
+ * only ever renders for someone who is past it — Dashboard is where the app
+ * starts once there is a session.
  */
 const navItems: NavItem[] = [
-  { href: paths.home(), label: 'Home', Icon: House },
+  { href: paths.dashboard(), label: 'Dashboard', Icon: LayoutCells },
   { href: paths.crypto.index(), label: 'Crypto', Icon: Cubes3 },
   { href: paths.forex.index(), label: 'Forex', Icon: ArrowRightArrowLeft },
   {
@@ -227,10 +231,16 @@ export default function Header({ user }: { user: SessionUser }) {
               </Drawer.Backdrop>
             </Drawer>
           </div>
+          {/*
+           * The brand goes to the dashboard, not to `/`. The convention is that
+           * a logo leads home, but home here is the public landing page — a
+           * signed-in visitor clicking the mark wants the app, not the page that
+           * exists to explain it to strangers.
+           */}
           <Link
-            href={paths.home()}
+            href={paths.dashboard()}
             aria-current={
-              isActive(pathname, paths.home()) ? 'page' : undefined
+              isActive(pathname, paths.dashboard()) ? 'page' : undefined
             }
             className={`flex items-center gap-2 rounded-md px-2 py-1 font-bold tracking-tight transition-colors hover:bg-surface-hover ${focusRing}`}
           >

@@ -15,10 +15,11 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 /**
- * The only page a crawler can reach, so this is the entry Google will show for
- * the site. The canonical matters more than usual: `proxy.ts` sends visitors
- * here with a `callbackUrl`, and Auth.js with an `error`, so the same page is
- * reachable at many query strings that would otherwise be indexed separately.
+ * One of the two pages a crawler can reach — `/` is the other, and the one the
+ * sitemap points at first. The canonical matters more here than usual:
+ * `proxy.ts` sends visitors here with a `callbackUrl`, and Auth.js with an
+ * `error`, so the same page is reachable at many query strings that would
+ * otherwise be indexed separately.
  */
 export const metadata: Metadata = {
   title: 'Sign in',

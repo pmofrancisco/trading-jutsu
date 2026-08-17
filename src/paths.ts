@@ -12,7 +12,17 @@ export function absoluteUrl(path: string): string {
 }
 
 export const paths = {
+  /**
+   * The public landing page. Along with `signIn`, one of the two routes a
+   * visitor without a session can read — see `PUBLIC_PATHS` in `proxy.ts`.
+   */
   home: () => '/',
+  /**
+   * Where a signed-in visitor lands, and the app's root as far as the navigation
+   * is concerned: nothing in the header links to `home`, because the header only
+   * renders for someone who is already past it.
+   */
+  dashboard: () => '/dashboard',
   signIn: () => '/sign-in',
   crypto: {
     index: () => '/crypto',

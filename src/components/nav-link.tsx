@@ -3,9 +3,13 @@ import Link from 'next/link';
 
 /**
  * Whether `href` names the section the visitor is in, as opposed to the exact
- * page they are on. Home is `/`, the prefix of every other route, so it alone
- * has to match exactly; the rest also match their subpaths, which is what keeps
+ * page they are on. Most routes match their subpaths too, which is what keeps
  * "PH Stocks" lit while the visitor is on `/ph-stocks/indices-performance`.
+ *
+ * `/` is the exception, and has to match exactly: it is the prefix of every
+ * other route, so prefix-matching it would light it on every page in the app.
+ * Nothing in the header links there anymore — see the note on `navItems` — but
+ * the rule stays, because it is a property of the path and not of the caller.
  */
 export function isActive(pathname: string, href: string): boolean {
   if (href === paths.home()) return pathname === href;
