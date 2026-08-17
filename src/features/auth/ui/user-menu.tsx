@@ -2,7 +2,7 @@
 
 import { signOut } from '@/features/auth/actions/sign-out';
 import type { SessionUser } from '@/features/auth/data/session';
-import { Person } from '@gravity-ui/icons';
+import { ArrowRightFromSquare, Person } from '@gravity-ui/icons';
 import { Avatar, Button, Popover, Separator, Spinner } from '@heroui/react';
 import { useFormStatus } from 'react-dom';
 
@@ -43,7 +43,17 @@ function SignOutButton() {
     >
       {({ isPending }) => (
         <>
-          {isPending && <Spinner color="current" size="sm" />}
+          {/*
+           * The spinner takes the icon's place rather than sitting beside it,
+           * as on `SignInForm`'s button: the row keeps its width and the label
+           * does not shift when the state changes. `aria-hidden` because the
+           * label already names the action.
+           */}
+          {isPending ? (
+            <Spinner color="current" size="sm" />
+          ) : (
+            <ArrowRightFromSquare aria-hidden />
+          )}
           {isPending ? 'Signing out...' : 'Sign out'}
         </>
       )}
