@@ -13,8 +13,14 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
+/**
+ * The root layout's description is the landing page's description — that page is
+ * the one `openGraph.url` below names — so it describes the product rather than
+ * the dashboard behind it. Under 160 characters, which is roughly where Google
+ * truncates a snippet.
+ */
 const description =
-  'A personal markets dashboard tracking Philippine Stock Exchange index performance, crypto and forex.';
+  'Rule-based trading systems — trend following, momentum, mean reversion and more — across Philippine and US equities, crypto and forex. Free to start.';
 
 export const metadata: Metadata = {
   // Lets every URL-based field below — and `alternates.canonical` in the

@@ -14,7 +14,12 @@
  * the cause: they cannot fix it, and the detail belongs in the server log.
  */
 const SIGN_IN_ERRORS: Record<string, string> = {
-  AccessDenied: 'That GitHub account does not have access to this app.',
+  // Worded to match the early-access note on the sign-in page itself. The
+  // visitor most likely to see this is one who arrived from the landing page's
+  // pricing, so "not on the list yet" tells them the truth — the account is
+  // fine, the app is not open — where "does not have access" reads as a
+  // judgement on their account.
+  AccessDenied: 'That GitHub account is not on the early-access list yet.',
   Configuration: 'Sign-in is unavailable right now. Please try again later.',
 };
 
