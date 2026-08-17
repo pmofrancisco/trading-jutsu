@@ -2,8 +2,9 @@ import Mark from '@/components/mark';
 import ThemeSwitch from '@/components/theme-switch';
 
 /**
- * The header for a visitor without a session — the sign-in page, and `/` when
- * whoever is reading it has not signed in.
+ * The header for a visitor without a session — the sign-in page and `/`, the
+ * two routes that render for nobody else, since each redirects a signed-in
+ * visitor onward.
  *
  * Deliberately not `<Header />`: that one needs a `SessionUser`, and every
  * destination in it — the navigation, the account menu — is behind the sign-in
