@@ -23,8 +23,11 @@ import { redirect } from 'next/navigation';
  */
 export const metadata: Metadata = {
   title: 'Sign in',
+  // Echoes the root layout's description — the landing page sells the systems,
+  // and a visitor arriving here from one of its calls to action should not be
+  // told they are signing in to something else.
   description:
-    'Sign in to Trading Jutsu, a personal markets dashboard for Philippine Stock Exchange indices, crypto and forex.',
+    'Sign in to Trading Jutsu — rule-based trading systems for Philippine and US equities, crypto and forex.',
   alternates: { canonical: paths.signIn() },
   // `url` overrides the root layout's site-root URL so the link preview and the
   // canonical above name the same page rather than disagreeing. `type` and
@@ -115,14 +118,15 @@ export default async function SignIn({ searchParams }: SignInProps) {
               Sign in to Trading Jutsu
             </Typography.Heading>
             {/*
-             * The on-page counterpart to this route's meta description. Worth
-             * the line twice over: this is the result Google shows for the
-             * site, and it is all a stranger who lands here ever learns about
-             * what they are being asked to sign in to.
+             * The on-page counterpart to this route's meta description, and the
+             * same words the landing page's hero uses. A visitor who clicked
+             * "Start free as a Genin" should recognise what they arrived at;
+             * describing it differently here reads as a different product.
              */}
             <Typography.Paragraph align="center" color="muted" size="sm">
-              A personal markets dashboard for Philippine Stock Exchange
-              indices, crypto and forex.
+              Rule-based trading systems — trend following, momentum, mean
+              reversion and more — for Philippine and US equities, crypto and
+              forex.
             </Typography.Paragraph>
           </Card.Header>
           <Card.Content className="gap-4">
@@ -131,9 +135,21 @@ export default async function SignIn({ searchParams }: SignInProps) {
             {/*
              * Says up front what the `AccessDenied` alert would otherwise say
              * only after the visitor has handed over their GitHub account.
+             *
+             * It has to stay, and it has to stay honest: `lib/auth.ts` allows a
+             * single `ADMIN_EMAIL` and turns every other account away, so copy
+             * promising the free rank on the landing page would send a stranger
+             * through a GitHub authorization that cannot succeed. What it does
+             * do is name the ranks, so the reader who clicked "Start free as a
+             * Genin" learns why they cannot have one yet rather than concluding
+             * the button was broken.
+             *
+             * Delete this line when the allowlist goes — not before.
              */}
             <Typography.Paragraph align="center" color="muted" size="xs">
-              Access is limited to the owner&rsquo;s GitHub account.
+              Trading Jutsu is in closed early access: sign-in is limited to
+              approved GitHub accounts. Genin, Chunin and Jonin open to everyone
+              at launch.
             </Typography.Paragraph>
           </Card.Content>
         </Card>

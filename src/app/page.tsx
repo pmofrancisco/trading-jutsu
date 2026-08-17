@@ -1,5 +1,10 @@
-import PublicHeader from '@/components/public-header';
 import { getCurrentUser } from '@/features/auth/data/session';
+import FinalCta from '@/features/marketing/ui/final-cta';
+import Hero from '@/features/marketing/ui/hero';
+import LandingHeader from '@/features/marketing/ui/landing-header';
+import Pricing from '@/features/marketing/ui/pricing';
+import Testimonials from '@/features/marketing/ui/testimonials';
+import TradingSystems from '@/features/marketing/ui/trading-systems';
 import { paths } from '@/paths';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
@@ -21,6 +26,13 @@ export const metadata: Metadata = {
  * It sits outside `(private)` — that group's layout calls `requireUser()`, which
  * would redirect the visitor this page exists to serve — so the header and the
  * `<main>` landmark that group provides are composed here instead.
+ *
+ * Composition only, per the note on `app/` in AGENTS.md: every band below is a
+ * component in `features/marketing/ui`, and the order they appear in is the
+ * argument the page makes — what it is, what it does, who says it works, what
+ * it costs, and then the ask. Social proof deliberately sits *before* the
+ * pricing, so the reader meets the numbers having already read someone else's
+ * account of what they buy.
  *
  * Reading the session opts this route into dynamic rendering, which is
  * unavoidable: whether the page renders at all depends on who is asking.
@@ -44,14 +56,20 @@ export default async function Home() {
 
   return (
     <>
-      {/* `PublicHeader` unconditionally: past the redirect above, nobody
+      {/* `LandingHeader` unconditionally: past the redirect above, nobody
        * reading this page has a session for `<Header />` to render. */}
-      <PublicHeader />
+      <LandingHeader />
       {/* The landmark that pairs with the `<header>` and `<nav>` inside it, so
-       * a screen reader can skip straight to the page's own content. Matches
-       * `(private)/layout` so the page does not shift when the header does. */}
-      <main className="p-4">
-        <div>Home Page</div>
+       * a screen reader can skip straight to the page's own content. No padding
+       * of its own, unlike `(private)/layout`: each band below runs edge to edge
+       * and sets its own gutter, so that a section's background and its top rule
+       * reach the sides of the viewport. */}
+      <main>
+        <Hero />
+        <TradingSystems />
+        <Testimonials />
+        <Pricing />
+        <FinalCta />
       </main>
     </>
   );
