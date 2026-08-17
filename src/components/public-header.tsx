@@ -27,7 +27,7 @@ export default function PublicHeader() {
        * signed-in header points the same mark at the dashboard instead.
        */}
       <div className="flex items-center gap-2 px-2 py-1 font-bold tracking-tight">
-        <Mark className="size-5 shrink-0 text-accent" />
+        <Mark className="size-5 shrink-0" />
         Trading Jutsu
       </div>
       <ThemeSwitch />
