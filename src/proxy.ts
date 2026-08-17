@@ -8,6 +8,15 @@ const SESSION_COOKIE_NAMES = [
 ];
 
 /**
+ * The routes that answer a request without a session with a 200 rather than a
+ * redirect. Matched exactly: every path below either of these is private, and a
+ * prefix test on `/` would let the whole app through.
+ *
+ * These are also exactly the URLs a crawler can index — see `sitemap.ts`.
+ */
+const PUBLIC_PATHS = [paths.home(), paths.signIn()];
+
+/**
  * An optimistic gate: it only looks for the presence of a session cookie, never
  * at its contents. That keeps it cheap enough to run on every request —
  * including prefetches — and it is not a security boundary. The real checks
@@ -24,7 +33,7 @@ export function proxy(request: NextRequest) {
 
   const { pathname, search } = request.nextUrl;
 
-  if (pathname === paths.signIn()) {
+  if (PUBLIC_PATHS.includes(pathname)) {
     return NextResponse.next();
   }
 
