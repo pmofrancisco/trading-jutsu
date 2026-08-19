@@ -1,39 +1,33 @@
-import Mark from '@/components/mark';
+import SiteHeader from '@/components/site-header';
 import ThemeSwitch from '@/components/theme-switch';
+import { paths } from '@/paths';
 
 /**
  * The header for the sign-in page — one of the two routes that render for a
  * visitor without a session, since each redirects a signed-in visitor onward.
- * `/` is the other, and has a header of its own: see `LandingHeader`, which
- * carries the section links and the "Sign in" button that would only lead back
- * here from here.
+ * `/` is the other, and carries the same bar with more in it: see
+ * `LandingHeader`, which adds the section links and the "Sign in" button that
+ * would only lead back here from here.
  *
  * Deliberately not `<Header />`: that one needs a `SessionUser`, and every
  * destination in it — the navigation, the account menu — is behind the sign-in
  * this visitor has not completed, so `proxy.ts` would bounce them off any of
- * them. What is left worth keeping is the mark and the theme switch, which is
- * enough for this page to read as part of the app rather than a screen of its
- * own.
+ * them. What is left worth keeping is the mark and the theme switch.
+ *
+ * The mark is a link here, and is not on the landing page, because here it is
+ * the page's only way out. A visitor who arrived from one of the landing page's
+ * calls to action and wants to read the pricing again should not have to reach
+ * for the back button — a sign-in screen whose every other control hands an
+ * account to a third party is exactly where a stranger is most likely to want
+ * to go back and check something first.
  *
  * A Server Component: only `ThemeSwitch` needs the client, and it brings its own
  * boundary.
  */
 export default function PublicHeader() {
   return (
-    // No `sticky`: this sits above a card that is centred in the viewport, so
-    // there is nothing to scroll past it and nothing showing through it.
-    <header className="flex items-center justify-between border-b border-b-border p-2">
-      {/*
-       * Plain text, not a link. Pointing it at `/` would send a visitor who is
-       * part-way through signing in back to the page selling them the thing —
-       * and the signed-in header points the same mark at the dashboard rather
-       * than at `/` for its own reasons.
-       */}
-      <div className="flex items-center gap-2 px-2 py-1 font-bold tracking-tight">
-        <Mark className="size-5 shrink-0" />
-        Trading Jutsu
-      </div>
+    <SiteHeader brandHref={paths.home()}>
       <ThemeSwitch />
-    </header>
+    </SiteHeader>
   );
 }

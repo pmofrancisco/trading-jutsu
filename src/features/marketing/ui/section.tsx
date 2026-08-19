@@ -1,3 +1,4 @@
+import { container } from '@/components/container';
 import { Typography } from '@heroui/react';
 import type { ReactNode } from 'react';
 
@@ -12,13 +13,6 @@ export const sectionIds = {
   testimonials: 'testimonials',
   pricing: 'pricing',
 } as const;
-
-/**
- * The horizontal frame every band on the page shares — one measure, one gutter,
- * so the hero, the cards and the closing call to action all line up down the
- * left edge at every width.
- */
-export const container = 'mx-auto w-full max-w-6xl px-4 sm:px-6';
 
 /**
  * One band of the landing page: a rule, an eyebrow, a heading, an optional
