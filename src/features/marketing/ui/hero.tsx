@@ -1,6 +1,7 @@
+import { container } from '@/components/container';
 import Mark, { markColor } from '@/components/mark';
 import CtaLink from '@/features/marketing/ui/cta-link';
-import { container, sectionIds } from '@/features/marketing/ui/section';
+import { sectionIds } from '@/features/marketing/ui/section';
 import { paths } from '@/paths';
 import { Chip, Typography } from '@heroui/react';
 

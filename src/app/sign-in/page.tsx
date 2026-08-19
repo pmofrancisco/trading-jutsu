@@ -94,7 +94,7 @@ export default async function SignIn({ searchParams }: SignInProps) {
        * `(private)/layout`, which is where the app's other `<main>` lives, so
        * without it the one page a stranger can reach has no landmarks at all.
        */}
-      <main className="flex-1 flex items-center justify-center p-4">
+      <main className="flex-1 flex items-center justify-center px-4 py-10">
         <Card className="w-full max-w-sm">
           <Card.Header className="gap-2">
             {/*
@@ -132,6 +132,14 @@ export default async function SignIn({ searchParams }: SignInProps) {
           <Card.Content className="gap-4">
             {errorMessage && <SignInAlert message={errorMessage} />}
             <SignInForm callbackUrl={destination} />
+          </Card.Content>
+          {/*
+           * A footer behind a rule rather than a fourth line of the card's
+           * content: it is fine print about who may sign in, not another step in
+           * signing in, and set directly under the button it read as a caption
+           * belonging to it.
+           */}
+          <Card.Footer className="border-t border-t-border pt-4">
             {/*
              * Says up front what the `AccessDenied` alert would otherwise say
              * only after the visitor has handed over their GitHub account.
@@ -146,12 +154,20 @@ export default async function SignIn({ searchParams }: SignInProps) {
              *
              * Delete this line when the allowlist goes — not before.
              */}
-            <Typography.Paragraph align="center" color="muted" size="xs">
+            {/* `flex-1`: `Card.Footer` is a flex row, so without it the
+             * paragraph shrinks to its longest line and `align="center"` centres
+             * the text inside a box that is no longer the card's width. */}
+            <Typography.Paragraph
+              align="center"
+              className="flex-1"
+              color="muted"
+              size="xs"
+            >
               Trading Jutsu is in closed early access: sign-in is limited to
               approved GitHub accounts. Genin, Chunin and Jonin open to everyone
               at launch.
             </Typography.Paragraph>
-          </Card.Content>
+          </Card.Footer>
         </Card>
       </main>
     </>
