@@ -18,15 +18,6 @@ export function isActive(pathname: string, href: string): boolean {
 }
 
 /**
- * The focus ring HeroUI's own controls draw, as utilities. A bare `<a>` gets
- * none of a `Button`'s styling, so without this the navigation links would be
- * the only interactive elements in the app with a browser-default focus
- * outline.
- */
-const focusRing =
-  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus';
-
-/**
  * One navigation row, shared by every navigation in the app — the header's
  * drawer stacks these, its desktop bar lays them out in a line, and a section's
  * nested menu reuses them so the active state looks and reads the same at every
@@ -63,7 +54,15 @@ export default function NavLink({
       // background colour.
       aria-current={pathname === href ? 'page' : undefined}
       onClick={onNavigate}
-      className={`flex items-center gap-3 rounded-md px-3 py-2 transition-colors ${focusRing} ${
+      /*
+       * `focus-visible:status-focused` is the ring HeroUI's own controls draw
+       * — the utility their CSS applies, applied directly, rather than the
+       * hand-rolled `outline` that used to stand in for it and drew a visibly
+       * different indicator beside every button in the same bar. A bare `<a>`
+       * gets none of a `Button`'s styling, so without it these would be the
+       * only interactive elements in the app with a browser-default outline.
+       */
+      className={`flex items-center gap-3 rounded-md px-3 py-2 transition-colors focus-visible:status-focused ${
         isActive(pathname, href)
           ? 'bg-accent-soft text-accent-soft-foreground font-medium'
           : 'text-muted hover:bg-surface-hover hover:text-foreground'

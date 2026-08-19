@@ -1,3 +1,4 @@
+import { gutter } from '@/components/container';
 import Header from '@/components/header';
 import { requireUser } from '@/features/auth/data/session';
 import type { Metadata } from 'next';
@@ -30,8 +31,12 @@ export default async function PrivateLayout({
     <>
       <Header user={user} />
       {/* The landmark that pairs with the `<header>` and `<nav>` inside it, so
-       * a screen reader can skip straight to the page's own content. */}
-      <main className="p-4">{children}</main>
+       * a screen reader can skip straight to the page's own content.
+       *
+       * `gutter` rather than a padding of its own: the header runs on it too,
+       * and a page whose content started 8px inside the mark above it would
+       * read as two panels stacked rather than one column. */}
+      <main className={`${gutter} py-4`}>{children}</main>
     </>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
-import Mark from '@/components/mark';
-import NavLink, { isActive } from '@/components/nav-link';
+import NavLink from '@/components/nav-link';
+import SiteHeader from '@/components/site-header';
 import ThemeSwitch from '@/components/theme-switch';
 import type { SessionUser } from '@/features/auth/data/session';
 import UserMenu from '@/features/auth/ui/user-menu';
@@ -15,7 +15,6 @@ import {
   LayoutCells,
 } from '@gravity-ui/icons';
 import { Button, Drawer, Popover } from '@heroui/react';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
@@ -63,14 +62,6 @@ const navItems: NavItem[] = [
 ];
 
 /**
- * The focus ring HeroUI's own controls draw, as utilities. A bare `<a>` gets
- * none of a `Button`'s styling, so without this the brand link would be the
- * only interactive element in the app with a browser-default focus outline.
- */
-const focusRing =
-  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus';
-
-/**
  * A section in the desktop bar, as a link plus a disclosure for its pages.
  *
  * The two are separate controls on purpose. Turning the section itself into the
@@ -115,9 +106,14 @@ function SectionNavItem({
           variant="ghost"
           aria-label={`${label} pages`}
         >
+          {/*
+           * `motion-reduce:transition-none` for the same reason HeroUI's own
+           * controls carry it: a half-turn is decoration, and the state it
+           * decorates is already carried by `aria-expanded`.
+           */}
           <ChevronDown
             aria-hidden
-            className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}
+            className={`transition-transform motion-reduce:transition-none ${isOpen ? 'rotate-180' : ''}`}
           />
         </Button>
         {/*
@@ -152,6 +148,20 @@ function SectionNavItem({
 }
 
 /**
+ * The signed-in bar: `SiteHeader`'s frame — the same one `/` and `/sign-in`
+ * wear, down to the height, the gutter and the mark's position — carrying the
+ * navigation those pages have no session to offer.
+ *
+ * `fluid`, unlike them: the signed-in pages are full-bleed, and a bar that
+ * stopped at `max-w-6xl` would float above a grid that does not.
+ *
+ * The mark leads to the dashboard, not to `/`. The convention is that a logo
+ * leads home, but home here is the public landing page — a signed-in visitor
+ * clicking the mark wants the app, not the page that exists to explain it to
+ * strangers. It carries no `aria-current`: on `/dashboard` the navigation's own
+ * "Dashboard" link is already marked, and two current pages in one bar is one
+ * more than there can be.
+ *
  * Client-only for the drawer state and the active-route highlight. The user
  * arrives as a prop from the server rather than from `useSession()`, so there
  * is no client-side session fetch and no flash of signed-out UI on first paint.
@@ -161,127 +171,120 @@ export default function Header({ user }: { user: SessionUser }) {
   const pathname = usePathname();
 
   return (
-    // `sticky`: the PH Stocks grid is taller than the viewport, and the
-    // navigation should not scroll away with it. The background is explicit
-    // because a sticky element sits over content that would otherwise show
-    // through it.
-    <header className="sticky top-0 z-40 bg-background border-b border-b-border">
-      <div className="flex p-2 items-center justify-between">
-        <div className="flex items-center gap-2">
-          {/*
-           * The drawer is the small-screen navigation only — above `sm` the
-           * same items are in the bar itself, where hiding them behind a button
-           * would cost a click for nothing.
-           */}
-          <div className="sm:hidden">
-            <Drawer isOpen={isOpen} onOpenChange={setIsOpen}>
-              {/*
-               * `aria-label`: the Gravity icons render a bare `<svg>` with no
-               * `<title>`, and an icon-only `Button` adds no name of its own, so
-               * without this the control that opens the navigation announces
-               * itself as "button".
-               */}
-              <Button isIconOnly variant="ghost" aria-label="Open navigation">
-                <Bars />
-              </Button>
-              <Drawer.Backdrop>
-                <Drawer.Content placement="left">
-                  <Drawer.Dialog>
-                    <Drawer.Body>
-                      <nav aria-label="Main">
-                        <ul className="flex flex-col gap-1">
-                          {navItems.map(({ href, label, Icon, pages }) => (
-                            <li key={href}>
-                              <NavLink
-                                href={href}
-                                label={label}
-                                Icon={Icon}
-                                pathname={pathname}
-                                onNavigate={() => setIsOpen(false)}
-                              />
-                              {/*
-                               * The drawer is already an open panel, so a
-                               * section's pages are nested in place rather than
-                               * behind a second disclosure — one tap to reach
-                               * them instead of two. A nested `<ul>` is what
-                               * conveys the hierarchy to a screen reader; the
-                               * rule and indent are for everyone else.
-                               */}
-                              {pages && (
-                                <ul className="mt-1 ml-5 flex flex-col gap-1 border-l border-l-border pl-2">
-                                  {pages.map((page) => (
-                                    <li key={page.href}>
-                                      <NavLink
-                                        href={page.href}
-                                        label={page.label}
-                                        pathname={pathname}
-                                        onNavigate={() => setIsOpen(false)}
-                                      />
-                                    </li>
-                                  ))}
-                                </ul>
-                              )}
-                            </li>
-                          ))}
-                        </ul>
-                      </nav>
-                    </Drawer.Body>
-                  </Drawer.Dialog>
-                </Drawer.Content>
-              </Drawer.Backdrop>
-            </Drawer>
-          </div>
-          {/*
-           * The brand goes to the dashboard, not to `/`. The convention is that
-           * a logo leads home, but home here is the public landing page — a
-           * signed-in visitor clicking the mark wants the app, not the page that
-           * exists to explain it to strangers.
-           */}
-          <Link
-            href={paths.dashboard()}
-            aria-current={
-              isActive(pathname, paths.dashboard()) ? 'page' : undefined
-            }
-            className={`flex items-center gap-2 rounded-md px-2 py-1 font-bold tracking-tight transition-colors hover:bg-surface-hover ${focusRing}`}
-          >
-            <Mark className="size-5 shrink-0" />
-            Trading Jutsu
-          </Link>
-          {/*
-           * `hidden`/`display: none` takes this out of the accessibility tree
-           * as well as the layout, so only one of the two navigations is ever
-           * exposed and the duplicate "Main" label is never ambiguous.
-           */}
-          <nav aria-label="Main" className="hidden sm:block ml-2">
-            <ul className="flex items-center gap-1">
-              {navItems.map(({ href, label, Icon, pages }) => (
-                <li key={href}>
-                  {pages ? (
-                    <SectionNavItem
-                      href={href}
-                      label={label}
-                      Icon={Icon}
-                      pages={pages}
-                      pathname={pathname}
-                    />
-                  ) : (
-                    <NavLink
-                      href={href}
-                      label={label}
-                      Icon={Icon}
-                      pathname={pathname}
-                    />
-                  )}
-                </li>
-              ))}
-            </ul>
-          </nav>
+    <SiteHeader
+      brandHref={paths.dashboard()}
+      fluid
+      start={
+        /*
+         * The drawer is the small-screen navigation only — above `sm` the same
+         * items are in the bar itself, where hiding them behind a button would
+         * cost a click for nothing. It is also `SiteHeader`'s `start` contract:
+         * the mark reclaims the row's leading edge exactly where this goes.
+         */
+        <div className="sm:hidden">
+          <Drawer isOpen={isOpen} onOpenChange={setIsOpen}>
+            {/*
+             * `aria-label`: the Gravity icons render a bare `<svg>` with no
+             * `<title>`, and an icon-only `Button` adds no name of its own, so
+             * without this the control that opens the navigation announces
+             * itself as "button".
+             *
+             * `lg` for its height, not its emphasis, and for the same reason the
+             * landing page's "Sign in" is: it is the only size HeroUI gives that
+             * clears 44px on a touch screen (`h-11`, dropping to `h-10` from
+             * `md` up). This is the only way to the navigation on a phone, so it
+             * is the last control in the app that should be a small target.
+             */}
+            <Button
+              isIconOnly
+              size="lg"
+              variant="ghost"
+              aria-label="Open navigation"
+            >
+              <Bars />
+            </Button>
+            <Drawer.Backdrop>
+              <Drawer.Content placement="left">
+                <Drawer.Dialog>
+                  <Drawer.Body>
+                    <nav aria-label="Main">
+                      <ul className="flex flex-col gap-1">
+                        {navItems.map(({ href, label, Icon, pages }) => (
+                          <li key={href}>
+                            <NavLink
+                              href={href}
+                              label={label}
+                              Icon={Icon}
+                              pathname={pathname}
+                              onNavigate={() => setIsOpen(false)}
+                            />
+                            {/*
+                             * The drawer is already an open panel, so a
+                             * section's pages are nested in place rather than
+                             * behind a second disclosure — one tap to reach
+                             * them instead of two. A nested `<ul>` is what
+                             * conveys the hierarchy to a screen reader; the
+                             * rule and indent are for everyone else.
+                             */}
+                            {pages && (
+                              <ul className="mt-1 ml-5 flex flex-col gap-1 border-l border-l-border pl-2">
+                                {pages.map((page) => (
+                                  <li key={page.href}>
+                                    <NavLink
+                                      href={page.href}
+                                      label={page.label}
+                                      pathname={pathname}
+                                      onNavigate={() => setIsOpen(false)}
+                                    />
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    </nav>
+                  </Drawer.Body>
+                </Drawer.Dialog>
+              </Drawer.Content>
+            </Drawer.Backdrop>
+          </Drawer>
         </div>
-        <div className="flex items-center gap-3">
-          <ThemeSwitch />
-          <UserMenu user={user} />
-        </div>
-      </div>
-    </header>
+      }
+      nav={
+        /*
+         * `hidden`/`display: none` takes this out of the accessibility tree as
+         * well as the layout, so only one of the two navigations is ever
+         * exposed and the duplicate "Main" label is never ambiguous.
+         */
+        <nav aria-label="Main" className="ml-2 hidden sm:block">
+          <ul className="flex items-center gap-1">
+            {navItems.map(({ href, label, Icon, pages }) => (
+              <li key={href}>
+                {pages ? (
+                  <SectionNavItem
+                    href={href}
+                    label={label}
+                    Icon={Icon}
+                    pages={pages}
+                    pathname={pathname}
+                  />
+                ) : (
+                  <NavLink
+                    href={href}
+                    label={label}
+                    Icon={Icon}
+                    pathname={pathname}
+                  />
+                )}
+              </li>
+            ))}
+          </ul>
+        </nav>
+      }
+    >
+      <ThemeSwitch />
+      <UserMenu user={user} />
+    </SiteHeader>
   );
 }
