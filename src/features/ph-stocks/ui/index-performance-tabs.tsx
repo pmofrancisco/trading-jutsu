@@ -5,7 +5,7 @@ import type {
 import IndexPerformanceCard from '@/features/ph-stocks/ui/index-performance-card';
 import { Tabs } from '@heroui/react';
 
-/** The same grid under either tab, so the cards do not shift on a switch. */
+/** The same grid under every tab, so the cards do not shift on a switch. */
 function PeriodGrid({
   performances,
   period,
@@ -29,12 +29,16 @@ function PeriodGrid({
 /**
  * The indices measured over each period, one period at a time.
  *
- * Tabs rather than two grids down the page: they are the same seven cards
- * measured from a different starting level, and stacking them would put the
- * quarter a full screen below the year with no way to compare the two. Both
- * panels are rendered on the server, so switching costs no fetch — `Tabs` keeps
+ * Tabs rather than a grid per period down the page: they are the same seven
+ * cards measured from a different starting level, and stacking them would put
+ * the month two full screens below the year with no way to compare them. Every
+ * panel is rendered on the server, so switching costs no fetch — `Tabs` keeps
  * its own selection state internally, which leaves this a Server Component with
  * only strings and numbers crossing the boundary.
+ *
+ * The tabs run longest window to shortest, and the first is the one `Tabs`
+ * opens on: the year is the figure the page has always led with, and the
+ * shorter windows are read against it.
  */
 export default function IndexPerformanceTabs({
   performances,
@@ -43,7 +47,7 @@ export default function IndexPerformanceTabs({
 }) {
   return (
     <Tabs>
-      {/* `self-start` so the pill is only as wide as the two tabs; the tab list
+      {/* `self-start` so the pill is only as wide as the tabs; the tab list
        * would otherwise stretch across the page, which the column layout of
        * `Tabs` makes it do by default. */}
       <Tabs.ListContainer className="self-start">
@@ -51,7 +55,7 @@ export default function IndexPerformanceTabs({
           {/*
            * The indicator is the moving pill behind the selected tab, and it
            * lives inside each tab: React Aria hands it its selected state
-           * through context and animates it between the two.
+           * through context and animates it between them.
            */}
           <Tabs.Tab id="ytd">
             <Tabs.Indicator />
@@ -61,6 +65,10 @@ export default function IndexPerformanceTabs({
             <Tabs.Indicator />
             QTD
           </Tabs.Tab>
+          <Tabs.Tab id="mtd">
+            <Tabs.Indicator />
+            MTD
+          </Tabs.Tab>
         </Tabs.List>
       </Tabs.ListContainer>
       <Tabs.Panel id="ytd">
@@ -68,6 +76,9 @@ export default function IndexPerformanceTabs({
       </Tabs.Panel>
       <Tabs.Panel id="qtd">
         <PeriodGrid performances={performances} period="qtd" />
+      </Tabs.Panel>
+      <Tabs.Panel id="mtd">
+        <PeriodGrid performances={performances} period="mtd" />
       </Tabs.Panel>
     </Tabs>
   );

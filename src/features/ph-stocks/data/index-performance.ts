@@ -2,24 +2,44 @@ import 'server-only';
 
 import { requireUser } from '@/features/auth/data/session';
 import { phStocksDb } from '@/lib/ph-stocks-db';
-import type { IndexPerformance, PeriodPerformance } from './dto';
+import type {
+  IndexPerformance,
+  PeriodPerformance,
+  PerformancePeriod,
+} from './dto';
 import { PSE_INDEX_SYMBOLS, PSE_INDICES } from './pse-indices';
 
 /**
- * Picks the most recent bar per symbol, plus the last bar before the start of
- * the year and the last one before the start of the quarter — the index's
- * closing levels for the previous year and the previous quarter, which
- * year-to-date and quarter-to-date are conventionally measured from.
+ * Where each window starts, as the unit `date_trunc` truncates the newest bar
+ * to. This is the whole definition of a period: the query takes the units from
+ * here rather than naming any one of them, so a fourth window is this record and
+ * the union behind it, not another block of SQL.
+ */
+const PERIOD_TRUNC_UNITS: Record<PerformancePeriod, string> = {
+  ytd: 'year',
+  qtd: 'quarter',
+  mtd: 'month',
+};
+
+const PERIOD_KEYS = Object.keys(PERIOD_TRUNC_UNITS) as PerformancePeriod[];
+const PERIOD_UNITS = PERIOD_KEYS.map((period) => PERIOD_TRUNC_UNITS[period]);
+
+/**
+ * Picks the most recent bar per symbol, and then, for each period, the last bar
+ * before that period began — the index's closing level for the previous year,
+ * quarter or month, which the to-date figures are conventionally measured from.
+ * One row comes back per index per period.
  *
- * Both cut-offs come from the newest bar in the table rather than from the
+ * Every cut-off comes from the newest bar in the table rather than from the
  * server clock, so the figures always describe the period of the data being
- * displayed and do not depend on the server's time zone. In the first quarter
- * the two land on the same day and the two figures agree, which is simply what
- * quarter-to-date means in January.
+ * displayed and do not depend on the server's time zone. In January all three
+ * land on the same day and all three figures agree, which is simply what
+ * quarter-to-date and month-to-date mean in January.
  *
- * The baselines are `LEFT JOIN LATERAL` rather than a second `DISTINCT ON`: the
- * two differ only in the cut-off they compare against, and a lateral says that
- * once per cut-off instead of repeating a whole CTE with one word changed. Left,
+ * The periods arrive as parallel `text[]` parameters and are unnested into rows
+ * rather than written out as a lateral each: the windows differ only in the
+ * cut-off they compare against, so one lateral over a list of cut-offs says once
+ * what three copies would say three times with one word changed. It is left,
  * because an index first tracked partway through the year has no bar before
  * January and must still come back with its latest level so the page can say so.
  * `LIMIT 1` on a descending scan of the unique `(symbol, timestamp)` index stops
@@ -34,57 +54,54 @@ const PERFORMANCE_SQL = `
     WHERE symbol = ANY($1::text[])
     ORDER BY symbol, timestamp DESC
   ),
-  bounds AS (
+  periods AS (
     SELECT
-      date_trunc('year', newest.ts) AT TIME ZONE 'UTC' AS year_start,
-      date_trunc('quarter', newest.ts) AT TIME ZONE 'UTC' AS quarter_start
+      p.period,
+      date_trunc(p.unit, newest.ts) AT TIME ZONE 'UTC' AS start
     FROM (SELECT max(timestamp) AT TIME ZONE 'UTC' AS ts FROM latest) newest
+    CROSS JOIN unnest($2::text[], $3::text[]) AS p(period, unit)
   )
   SELECT
     l.symbol,
+    p.period,
     l.timestamp AS as_of,
     l.close::float8 AS latest_close,
-    y.timestamp AS year_baseline_date,
-    y.close::float8 AS year_baseline_close,
-    q.timestamp AS quarter_baseline_date,
-    q.close::float8 AS quarter_baseline_close
+    b.timestamp AS baseline_date,
+    b.close::float8 AS baseline_close
   FROM latest l
-  CROSS JOIN bounds b
+  CROSS JOIN periods p
   LEFT JOIN LATERAL (
     SELECT m.timestamp, m.close
     FROM market_data m
-    WHERE m.symbol = l.symbol AND m.timestamp < b.year_start
+    WHERE m.symbol = l.symbol AND m.timestamp < p.start
     ORDER BY m.timestamp DESC
     LIMIT 1
-  ) y ON true
-  LEFT JOIN LATERAL (
-    SELECT m.timestamp, m.close
-    FROM market_data m
-    WHERE m.symbol = l.symbol AND m.timestamp < b.quarter_start
-    ORDER BY m.timestamp DESC
-    LIMIT 1
-  ) q ON true
+  ) b ON true
 `;
 
+/**
+ * One index measured over one period. The latest bar repeats across a symbol's
+ * rows — it is the same bar every period is measured to.
+ */
 interface PerformanceRow {
   symbol: string;
+  period: PerformancePeriod;
   as_of: Date;
   latest_close: number;
-  year_baseline_date: Date | null;
-  year_baseline_close: number | null;
-  quarter_baseline_date: Date | null;
-  quarter_baseline_close: number | null;
+  baseline_date: Date | null;
+  baseline_close: number | null;
 }
 
 /** One period's figures, from the level it starts at and the level it ends at. */
 function toPeriodPerformance(
   latestClose: number | null,
-  baselineClose: number | null,
-  baselineDate: Date | null,
+  row: PerformanceRow | undefined,
 ): PeriodPerformance {
+  const baselineClose = row?.baseline_close ?? null;
+
   return {
     baselineClose,
-    baselineDate,
+    baselineDate: row?.baseline_date ?? null,
     // A zero baseline is excluded alongside a missing one: dividing by it
     // yields Infinity, which would render as a number and read as real.
     changePercent:
@@ -99,32 +116,44 @@ export async function listIndexPerformance(): Promise<IndexPerformance[]> {
 
   const { rows } = await phStocksDb().query<PerformanceRow>(PERFORMANCE_SQL, [
     PSE_INDEX_SYMBOLS,
+    PERIOD_KEYS,
+    PERIOD_UNITS,
   ]);
 
-  const bySymbol = new Map(rows.map((row) => [row.symbol, row]));
+  const rowsBySymbol = new Map<string, PerformanceRow[]>();
+
+  for (const row of rows) {
+    const symbolRows = rowsBySymbol.get(row.symbol);
+
+    if (symbolRows) {
+      symbolRows.push(row);
+    } else {
+      rowsBySymbol.set(row.symbol, [row]);
+    }
+  }
 
   // Mapping over `PSE_INDICES` rather than over `rows` fixes the display order
   // here and keeps a symbol the query found nothing for from disappearing.
   return PSE_INDICES.map(({ symbol, name }) => {
-    const row = bySymbol.get(symbol);
-    const latestClose = row?.latest_close ?? null;
+    const symbolRows = rowsBySymbol.get(symbol) ?? [];
+    // Any of the symbol's rows carries its latest bar; they only differ in what
+    // that bar is measured from.
+    const [anyPeriod] = symbolRows;
+    const latestClose = anyPeriod?.latest_close ?? null;
+    const byPeriod = new Map(symbolRows.map((row) => [row.period, row]));
 
     return {
       symbol,
       name,
       latestClose,
-      asOf: row?.as_of ?? null,
+      asOf: anyPeriod?.as_of ?? null,
+      // Written out rather than built from `PERIOD_KEYS` so the record stays
+      // exhaustively typed: a window added to `PerformancePeriod` is a type
+      // error here until it is produced.
       periods: {
-        ytd: toPeriodPerformance(
-          latestClose,
-          row?.year_baseline_close ?? null,
-          row?.year_baseline_date ?? null,
-        ),
-        qtd: toPeriodPerformance(
-          latestClose,
-          row?.quarter_baseline_close ?? null,
-          row?.quarter_baseline_date ?? null,
-        ),
+        ytd: toPeriodPerformance(latestClose, byPeriod.get('ytd')),
+        qtd: toPeriodPerformance(latestClose, byPeriod.get('qtd')),
+        mtd: toPeriodPerformance(latestClose, byPeriod.get('mtd')),
       },
     };
   });

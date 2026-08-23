@@ -3,13 +3,14 @@
  */
 
 /**
- * The windows an index's move is measured over.
+ * The windows an index's move is measured over, longest first — the order the
+ * tabs are in.
  *
- * A union rather than two loose fields on `IndexPerformance`, because it is what
- * keys the record below: adding a period here is a type error everywhere that
- * builds or reads one, so a new window cannot be half-added.
+ * A union rather than a loose field per window on `IndexPerformance`, because it
+ * is what keys the record below: adding a period here is a type error everywhere
+ * that builds or reads one, so a new window cannot be half-added.
  */
-export type PerformancePeriod = 'ytd' | 'qtd';
+export type PerformancePeriod = 'ytd' | 'qtd' | 'mtd';
 
 /**
  * One index's move over one period.
@@ -33,9 +34,9 @@ export interface PeriodPerformance {
  *
  * The identity and the latest level sit here rather than inside `periods`
  * because they do not vary by period: there is one newest bar per index, and
- * what changes between year-to-date and quarter-to-date is only what that bar is
- * measured from. `latestClose` and `asOf` are nullable for an index that is not
- * in the table at all and so has no bars whatsoever.
+ * what changes between the periods is only what that bar is measured from.
+ * `latestClose` and `asOf` are nullable for an index that is not in the table at
+ * all and so has no bars whatsoever.
  */
 export interface IndexPerformance {
   symbol: string;
