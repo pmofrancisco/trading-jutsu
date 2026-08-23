@@ -10,7 +10,7 @@
  * is what keys the record below: adding a period here is a type error everywhere
  * that builds or reads one, so a new window cannot be half-added.
  */
-export type PerformancePeriod = 'ytd' | 'qtd' | 'mtd';
+export type PerformancePeriod = 'ytd' | 'qtd' | 'mtd' | 'wtd';
 
 /**
  * One index's move over one period.

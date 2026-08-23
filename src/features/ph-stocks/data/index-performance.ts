@@ -12,13 +12,18 @@ import { PSE_INDEX_SYMBOLS, PSE_INDICES } from './pse-indices';
 /**
  * Where each window starts, as the unit `date_trunc` truncates the newest bar
  * to. This is the whole definition of a period: the query takes the units from
- * here rather than naming any one of them, so a fourth window is this record and
+ * here rather than naming any one of them, so another window is this record and
  * the union behind it, not another block of SQL.
+ *
+ * Postgres truncates a week to the Monday, so the week-to-date cut-off is the
+ * Monday of the newest bar's week and the level it measures from is the last bar
+ * before it — the previous Friday's close in a full trading week.
  */
 const PERIOD_TRUNC_UNITS: Record<PerformancePeriod, string> = {
   ytd: 'year',
   qtd: 'quarter',
   mtd: 'month',
+  wtd: 'week',
 };
 
 const PERIOD_KEYS = Object.keys(PERIOD_TRUNC_UNITS) as PerformancePeriod[];
@@ -27,14 +32,15 @@ const PERIOD_UNITS = PERIOD_KEYS.map((period) => PERIOD_TRUNC_UNITS[period]);
 /**
  * Picks the most recent bar per symbol, and then, for each period, the last bar
  * before that period began — the index's closing level for the previous year,
- * quarter or month, which the to-date figures are conventionally measured from.
- * One row comes back per index per period.
+ * quarter, month or week, which the to-date figures are conventionally measured
+ * from. One row comes back per index per period.
  *
  * Every cut-off comes from the newest bar in the table rather than from the
  * server clock, so the figures always describe the period of the data being
- * displayed and do not depend on the server's time zone. In January all three
- * land on the same day and all three figures agree, which is simply what
- * quarter-to-date and month-to-date mean in January.
+ * displayed and do not depend on the server's time zone. In January the year,
+ * quarter and month cut-offs land on the same day and those three figures agree,
+ * which is simply what quarter-to-date and month-to-date mean in January; the
+ * same happens to the month and the week whenever a month begins on a Monday.
  *
  * The periods arrive as parallel `text[]` parameters and are unnested into rows
  * rather than written out as a lateral each: the windows differ only in the
@@ -154,6 +160,7 @@ export async function listIndexPerformance(): Promise<IndexPerformance[]> {
         ytd: toPeriodPerformance(latestClose, byPeriod.get('ytd')),
         qtd: toPeriodPerformance(latestClose, byPeriod.get('qtd')),
         mtd: toPeriodPerformance(latestClose, byPeriod.get('mtd')),
+        wtd: toPeriodPerformance(latestClose, byPeriod.get('wtd')),
       },
     };
   });
