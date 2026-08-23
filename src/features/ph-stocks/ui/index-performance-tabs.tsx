@@ -69,6 +69,10 @@ export default function IndexPerformanceTabs({
             <Tabs.Indicator />
             MTD
           </Tabs.Tab>
+          <Tabs.Tab id="wtd">
+            <Tabs.Indicator />
+            WTD
+          </Tabs.Tab>
         </Tabs.List>
       </Tabs.ListContainer>
       <Tabs.Panel id="ytd">
@@ -79,6 +83,9 @@ export default function IndexPerformanceTabs({
       </Tabs.Panel>
       <Tabs.Panel id="mtd">
         <PeriodGrid performances={performances} period="mtd" />
+      </Tabs.Panel>
+      <Tabs.Panel id="wtd">
+        <PeriodGrid performances={performances} period="wtd" />
       </Tabs.Panel>
     </Tabs>
   );

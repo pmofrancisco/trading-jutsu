@@ -20,6 +20,7 @@ const PERIOD_NAMES: Record<PerformancePeriod, string> = {
   ytd: 'year-to-date',
   qtd: 'quarter-to-date',
   mtd: 'month-to-date',
+  wtd: 'week-to-date',
 };
 
 /**
