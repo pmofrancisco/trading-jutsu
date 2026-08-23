@@ -1,4 +1,7 @@
-import type { IndexPerformance } from '@/features/ph-stocks/data/dto';
+import type {
+  IndexPerformance,
+  PerformancePeriod,
+} from '@/features/ph-stocks/data/dto';
 import {
   formatDate,
   formatLevel,
@@ -7,20 +10,33 @@ import {
 } from '@/features/ph-stocks/ui/format';
 import { Card } from '@heroui/react';
 
+/**
+ * How each period is spelled out in the footer. The tab above the card is
+ * labelled with the abbreviation, which is enough while reading a column of
+ * figures; a sentence explaining why there is no figure is not the place to make
+ * someone expand "QTD" for themselves.
+ */
+const PERIOD_NAMES: Record<PerformancePeriod, string> = {
+  ytd: 'year-to-date',
+  qtd: 'quarter-to-date',
+};
+
+/**
+ * One index's move over one period.
+ *
+ * The period arrives as a key rather than as the `PeriodPerformance` itself, so
+ * the figures and the word naming them are drawn from the same place — a card
+ * cannot be handed the quarter's numbers under the year's name.
+ */
 export default function IndexPerformanceCard({
   performance,
+  period,
 }: {
   performance: IndexPerformance;
+  period: PerformancePeriod;
 }) {
-  const {
-    symbol,
-    name,
-    latestClose,
-    asOf,
-    baselineClose,
-    baselineDate,
-    ytdPercent,
-  } = performance;
+  const { symbol, name, latestClose, asOf, periods } = performance;
+  const { baselineClose, baselineDate, changePercent } = periods[period];
 
   return (
     <Card>
@@ -31,10 +47,10 @@ export default function IndexPerformanceCard({
       <Card.Content className="gap-1">
         <p
           className={`text-3xl font-bold tabular-nums ${
-            ytdPercent === null ? 'text-muted' : toneClassName(ytdPercent)
+            changePercent === null ? 'text-muted' : toneClassName(changePercent)
           }`}
         >
-          {ytdPercent === null ? '—' : formatPercent(ytdPercent)}
+          {changePercent === null ? '—' : formatPercent(changePercent)}
         </p>
         {latestClose !== null && (
           <p className="tabular-nums">
@@ -57,7 +73,7 @@ export default function IndexPerformanceCard({
           ) : latestClose === null ? (
             'No market data for this index.'
           ) : (
-            'Not enough history for a year-to-date figure.'
+            `Not enough history for a ${PERIOD_NAMES[period]} figure.`
           )}
         </p>
       </Card.Footer>

@@ -3,13 +3,39 @@
  */
 
 /**
- * Year-to-date performance of one PSE index.
+ * The windows an index's move is measured over.
  *
- * Every field but `symbol` and `name` is nullable, because the row is built for
- * each index we ask about whether or not `market_data` has the bars to price it:
- * a newly tracked index has no bar from last year to measure against, and one
- * that is not in the table at all has no bars whatsoever. The render context
- * decides how to present that; the data layer will not invent a number.
+ * A union rather than two loose fields on `IndexPerformance`, because it is what
+ * keys the record below: adding a period here is a type error everywhere that
+ * builds or reads one, so a new window cannot be half-added.
+ */
+export type PerformancePeriod = 'ytd' | 'qtd';
+
+/**
+ * One index's move over one period.
+ *
+ * Every field is nullable, because the row is built for each index we ask about
+ * whether or not `market_data` has the bars to price it: an index first tracked
+ * partway through the year has no bar from before January to measure against.
+ * The render context decides how to present that; the data layer will not invent
+ * a number.
+ */
+export interface PeriodPerformance {
+  /** Close of the last bar before the period began, its starting level. */
+  baselineClose: number | null;
+  baselineDate: Date | null;
+  /** Percentage change from `baselineClose` to the index's latest close. */
+  changePercent: number | null;
+}
+
+/**
+ * Performance of one PSE index.
+ *
+ * The identity and the latest level sit here rather than inside `periods`
+ * because they do not vary by period: there is one newest bar per index, and
+ * what changes between year-to-date and quarter-to-date is only what that bar is
+ * measured from. `latestClose` and `asOf` are nullable for an index that is not
+ * in the table at all and so has no bars whatsoever.
  */
 export interface IndexPerformance {
   symbol: string;
@@ -17,11 +43,8 @@ export interface IndexPerformance {
   /** Close of the most recent bar, and the day it is dated. */
   latestClose: number | null;
   asOf: Date | null;
-  /** Close of the last bar before 1 January, the year's starting level. */
-  baselineClose: number | null;
-  baselineDate: Date | null;
-  /** Percentage change from `baselineClose` to `latestClose`. */
-  ytdPercent: number | null;
+  /** The same latest close, measured from the start of each period. */
+  periods: Record<PerformancePeriod, PeriodPerformance>;
 }
 
 /**
