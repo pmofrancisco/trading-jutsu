@@ -19,6 +19,7 @@ import { Card } from '@heroui/react';
 const PERIOD_NAMES: Record<PerformancePeriod, string> = {
   ytd: 'year-to-date',
   qtd: 'quarter-to-date',
+  mtd: 'month-to-date',
 };
 
 /**
