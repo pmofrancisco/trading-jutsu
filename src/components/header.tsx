@@ -11,6 +11,7 @@ import {
   Bars,
   ChartLine,
   ChevronDown,
+  CircleDollar,
   Cubes3,
   LayoutCells,
 } from '@gravity-ui/icons';
@@ -37,8 +38,8 @@ interface NavItem {
  * colour and need no sizing of their own.
  *
  * A section's pages are nested under it rather than promoted to the top level:
- * the bar has room for a handful of items, and PH Stocks is the first section
- * with pages of its own.
+ * the bar has room for a handful of items, and the two market sections have
+ * pages of their own.
  *
  * `/` is deliberately absent. It is the public landing page, and this header
  * only ever renders for someone who is past it — Dashboard is where the app
@@ -60,6 +61,17 @@ const navItems: NavItem[] = [
       {
         href: paths.phStocks.indicesPerformance(),
         label: 'Indices Performance',
+      },
+    ],
+  },
+  {
+    href: paths.usStocks.index(),
+    label: 'US Stocks',
+    Icon: CircleDollar,
+    pages: [
+      {
+        href: paths.usStocks.gainersAndLosers(),
+        label: 'Gainers and Losers',
       },
     ],
   },
