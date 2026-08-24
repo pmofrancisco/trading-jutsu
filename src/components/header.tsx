@@ -54,6 +54,10 @@ const navItems: NavItem[] = [
     Icon: ChartLine,
     pages: [
       {
+        href: paths.phStocks.gainersAndLosers(),
+        label: 'Gainers and Losers',
+      },
+      {
         href: paths.phStocks.indicesPerformance(),
         label: 'Indices Performance',
       },
