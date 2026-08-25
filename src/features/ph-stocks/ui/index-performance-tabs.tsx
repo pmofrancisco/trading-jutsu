@@ -1,44 +1,15 @@
-import type {
-  IndexPerformance,
-  PerformancePeriod,
-} from '@/features/ph-stocks/data/dto';
+import type { IndexPerformance } from '@/features/ph-stocks/data/dto';
 import IndexPerformanceCard from '@/features/ph-stocks/ui/index-performance-card';
-import { Tabs } from '@heroui/react';
-
-/** The same grid under every tab, so the cards do not shift on a switch. */
-function PeriodGrid({
-  performances,
-  period,
-}: {
-  performances: IndexPerformance[];
-  period: PerformancePeriod;
-}) {
-  return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {performances.map((performance) => (
-        <IndexPerformanceCard
-          key={performance.symbol}
-          performance={performance}
-          period={period}
-        />
-      ))}
-    </div>
-  );
-}
+import PeriodTabs from '@/features/ph-stocks/ui/period-tabs';
 
 /**
  * The indices measured over each period, one period at a time.
  *
  * Tabs rather than a grid per period down the page: they are the same seven
  * cards measured from a different starting level, and stacking them would put
- * the month two full screens below the year with no way to compare them. Every
- * panel is rendered on the server, so switching costs no fetch — `Tabs` keeps
- * its own selection state internally, which leaves this a Server Component with
- * only strings and numbers crossing the boundary.
+ * the month two full screens below the year with no way to compare them.
  *
- * The tabs run longest window to shortest, and the first is the one `Tabs`
- * opens on: the year is the figure the page has always led with, and the
- * shorter windows are read against it.
+ * The same grid sits under every tab, so the cards do not shift on a switch.
  */
 export default function IndexPerformanceTabs({
   performances,
@@ -46,47 +17,18 @@ export default function IndexPerformanceTabs({
   performances: IndexPerformance[];
 }) {
   return (
-    <Tabs>
-      {/* `self-start` so the pill is only as wide as the tabs; the tab list
-       * would otherwise stretch across the page, which the column layout of
-       * `Tabs` makes it do by default. */}
-      <Tabs.ListContainer className="self-start">
-        <Tabs.List aria-label="Performance period">
-          {/*
-           * The indicator is the moving pill behind the selected tab, and it
-           * lives inside each tab: React Aria hands it its selected state
-           * through context and animates it between them.
-           */}
-          <Tabs.Tab id="ytd">
-            <Tabs.Indicator />
-            YTD
-          </Tabs.Tab>
-          <Tabs.Tab id="qtd">
-            <Tabs.Indicator />
-            QTD
-          </Tabs.Tab>
-          <Tabs.Tab id="mtd">
-            <Tabs.Indicator />
-            MTD
-          </Tabs.Tab>
-          <Tabs.Tab id="wtd">
-            <Tabs.Indicator />
-            WTD
-          </Tabs.Tab>
-        </Tabs.List>
-      </Tabs.ListContainer>
-      <Tabs.Panel id="ytd">
-        <PeriodGrid performances={performances} period="ytd" />
-      </Tabs.Panel>
-      <Tabs.Panel id="qtd">
-        <PeriodGrid performances={performances} period="qtd" />
-      </Tabs.Panel>
-      <Tabs.Panel id="mtd">
-        <PeriodGrid performances={performances} period="mtd" />
-      </Tabs.Panel>
-      <Tabs.Panel id="wtd">
-        <PeriodGrid performances={performances} period="wtd" />
-      </Tabs.Panel>
-    </Tabs>
+    <PeriodTabs label="Performance period">
+      {(period) => (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {performances.map((performance) => (
+            <IndexPerformanceCard
+              key={performance.symbol}
+              performance={performance}
+              period={period}
+            />
+          ))}
+        </div>
+      )}
+    </PeriodTabs>
   );
 }

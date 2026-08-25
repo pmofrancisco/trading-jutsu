@@ -1,0 +1,41 @@
+import {
+  LEADERS_LIMIT,
+  listPeriodLeaders,
+} from '@/features/ph-stocks/data/period-leaders';
+import { formatDate } from '@/features/ph-stocks/ui/format';
+import PeriodLeadersTabs from '@/features/ph-stocks/ui/period-leaders-tabs';
+import { Typography } from '@heroui/react';
+
+export default async function Leaders() {
+  const { asOf, periods } = await listPeriodLeaders();
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1">
+        {/*
+         * `Typography.Heading` rather than a bare `<h1>` so the page title picks
+         * up the same scale as the rest of the app. `level` is a number, so it
+         * survives the server/client boundary — see the note in `sign-in/page`.
+         *
+         * It names the page rather than the window it opens on: the window is
+         * the tabs' to say, and a heading reading "Year-to-date" above a
+         * selected QTD tab would contradict the figures under it.
+         */}
+        <Typography.Heading className="text-2xl" level={1} weight="bold">
+          Leaders
+        </Typography.Heading>
+        {/* The session is named once here rather than repeated per row: every
+         * ranking on the page is measured to the same one. */}
+        <p className="text-muted text-sm">
+          {/* Not "no market data": `asOf` is also null when the table holds
+           * bars but none of them can be measured over a window, and a message
+           * that blamed the data would send someone to the wrong place. */}
+          {asOf
+            ? `The ${LEADERS_LIMIT} biggest movers since the start of each period, up to trading on ${formatDate(asOf)}.`
+            : 'No leaders to show yet.'}
+        </p>
+      </div>
+      <PeriodLeadersTabs periods={periods} />
+    </div>
+  );
+}
