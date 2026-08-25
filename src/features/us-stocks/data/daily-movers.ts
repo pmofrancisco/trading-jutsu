@@ -12,7 +12,7 @@ import type { DailyMover, DailyMovers } from './dto';
  * in a single session, so an uncapped page would ship a row for each of them —
  * hence the extremes rather than the whole board.
  */
-export const MOVER_LIMIT = 20;
+export const MOVER_LIMIT = 50;
 
 /**
  * The session's biggest movers in each direction.
@@ -35,10 +35,10 @@ export const MOVER_LIMIT = 20;
  * did not trade in it.
  *
  * The ranking happens here rather than in TypeScript so that the two `LIMIT`s
- * decide what crosses the wire: forty rows arrive instead of twelve thousand.
- * Ordering by `change_percent` descending for gainers and ascending for losers
- * puts the biggest move first in each, with the symbol breaking ties so the
- * order is stable between requests.
+ * decide what crosses the wire: a hundred rows arrive instead of twelve
+ * thousand. Ordering by `change_percent` descending for gainers and ascending
+ * for losers puts the biggest move first in each, with the symbol breaking ties
+ * so the order is stable between requests.
  *
  * Both `DISTINCT ON` and the latest-session lookup ride the unique
  * `(symbol, timestamp)` index, and `::float8` converts Postgres `numeric` —
