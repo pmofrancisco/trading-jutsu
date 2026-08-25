@@ -27,9 +27,8 @@ export interface DailyMover {
  * move. Stocks that closed unchanged appear in neither list — they moved in no
  * direction, so there is no list they belong at either end of.
  *
- * Both lists are capped at `MOVER_LIMIT`. The US market lists thousands of
- * symbols where the PSE lists hundreds, so unlike the PH page these are the
- * extremes of the session rather than every stock that moved.
+ * Both lists are capped at `MOVER_LIMIT`: these are the ends of the board for
+ * the session, not every stock that moved over it.
  */
 export interface DailyMovers {
   /**

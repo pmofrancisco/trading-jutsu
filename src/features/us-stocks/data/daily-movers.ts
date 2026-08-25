@@ -7,10 +7,10 @@ import type { DailyMover, DailyMovers } from './dto';
 /**
  * How many movers each list holds.
  *
- * The PH page ranks every stock that moved, which works because the PSE lists a
- * few hundred of them. This table carries better than twelve thousand symbols
- * in a single session, so an uncapped page would ship a row for each of them —
- * hence the extremes rather than the whole board.
+ * A movers page is the ends of the board, not the whole of it, and that goes
+ * double here: this table carries better than twelve thousand symbols in a
+ * single session, so an uncapped page would ship a row for each of them to show
+ * the handful anyone came to read. The PH page caps at the same fifty.
  */
 export const MOVER_LIMIT = 50;
 
