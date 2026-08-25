@@ -1,16 +1,16 @@
 import 'server-only';
 
 import { requireUser } from '@/features/auth/data/session';
-import { phStocksDb } from '@/lib/ph-stocks-db';
+import { usStocksDb } from '@/lib/us-stocks-db';
 import type { PeriodLeader, PeriodLeaders, PerformancePeriod } from './dto';
 import { PERIOD_KEYS, PERIOD_UNITS } from './periods';
-import { PSE_INDEX_SYMBOLS } from './pse-indices';
 
 /**
  * How far down each period's ranking the page goes. A leaderboard is a cut of
- * the market, not the whole of it: the PSE lists a few hundred stocks, and four
+ * the market, not the whole of it, and that goes double here: this table
+ * carries better than twelve thousand symbols in a single session, so four
  * unbounded rankings would send the entire board over the wire four times to
- * show the top of it.
+ * show the top of it. The PH page cuts at the same fifty.
  */
 export const LEADERS_LIMIT = 50;
 
@@ -19,25 +19,27 @@ export const LEADERS_LIMIT = 50;
  * come since the start of each period.
  *
  * The session is taken the way `daily-movers` takes it — the newest timestamp
- * among the stocks — and not, as `index-performance` does, each symbol's own
- * newest bar. The difference matters here in a way it does not there: that page
- * prices seven indices that are always quoted, while this one ranks the whole
- * board, and a stock suspended in March would otherwise carry its March gain
- * into a ranking dated today and sit at the top of it. Confining the ranking to
- * one session also gives the page a single date to name.
+ * among the stocks — rather than each symbol's own newest bar: this ranks the
+ * whole board, and a stock suspended in March would otherwise carry its March
+ * gain into a ranking dated today and sit at the top of it. Confining the
+ * ranking to one session also gives the page a single date to name. As in
+ * `daily-movers`, there is no index symbol to exclude the way the PH query must
+ * — this database holds stocks, ETFs, warrants and units, but no index bars.
  *
  * The cut-offs come from that session rather than from the server clock, so the
  * windows describe the period of the data being displayed and do not depend on
- * the server's time zone. In January the year, quarter and month cut-offs land
- * on the same day and those three rankings agree, which is what
- * quarter-to-date and month-to-date mean in January.
+ * the server's time zone. `America/New_York` is the zone they are truncated in,
+ * because a US bar is dated at the closing bell — 20:00Z in summer, 21:00Z in
+ * winter — and not at midnight the way the PH bars are: truncated in UTC, an
+ * evening close would be filed under the following day and a window could open
+ * a day late. In January the year, quarter and month cut-offs land on the same
+ * day and those three rankings agree, which is what quarter-to-date and
+ * month-to-date mean in January.
  *
- * The baseline join is inner, unlike the `LEFT JOIN LATERAL` of
- * `index-performance`: an index with no bar before January must still appear so
- * the page can say it cannot be priced, but a stock with nothing to measure
- * against — or nothing recent enough to be the window's opening level, see the
- * bound inside the join — has no place in a ranking at all. `row_number()` cuts each period to
- * `LEADERS_LIMIT` inside the query, so only the rows that are displayed are
+ * The baseline join is inner: a stock with nothing to measure against — or
+ * nothing recent enough to be the window's opening level, see the bound inside
+ * the join — has no place in a ranking at all. `row_number()` cuts each period
+ * to `LEADERS_LIMIT` inside the query, so only the rows that are displayed are
  * built and returned.
  *
  * `::float8` converts Postgres `numeric` — which node-postgres would otherwise
@@ -47,19 +49,19 @@ const PERIOD_LEADERS_SQL = `
   WITH session AS (
     SELECT max(timestamp) AS ts
     FROM market_data
-    WHERE symbol <> ALL($1::text[])
   ),
   latest AS (
     SELECT m.symbol, m.close
     FROM market_data m, session s
-    WHERE m.timestamp = s.ts AND m.symbol <> ALL($1::text[])
+    WHERE m.timestamp = s.ts
   ),
   periods AS (
     SELECT
       p.period,
-      date_trunc(p.unit, s.ts AT TIME ZONE 'UTC') AT TIME ZONE 'UTC' AS start
+      date_trunc(p.unit, s.ts AT TIME ZONE 'America/New_York')
+        AT TIME ZONE 'America/New_York' AS start
     FROM session s
-    CROSS JOIN unnest($2::text[], $3::text[]) AS p(period, unit)
+    CROSS JOIN unnest($1::text[], $2::text[]) AS p(period, unit)
   ),
   ranked AS (
     SELECT
@@ -87,7 +89,8 @@ const PERIOD_LEADERS_SQL = `
         -- days is the longest a board realistically closes for, so a baseline
         -- older than that means the window cannot be measured at all, and the
         -- symbol drops out of that one ranking rather than being ranked on a
-        -- figure that is not what its label says.
+        -- figure that is not what its label says. The PH query bounds its
+        -- baseline the same way.
         AND m.timestamp >= p.start - interval '7 days'
       ORDER BY m.timestamp DESC
       LIMIT 1
@@ -100,7 +103,7 @@ const PERIOD_LEADERS_SQL = `
   )
   SELECT r.period, r.symbol, r.close, r.change_percent, s.ts AS as_of
   FROM ranked r, session s
-  WHERE r.rank <= $4
+  WHERE r.rank <= $3
   ORDER BY r.period, r.rank
 `;
 
@@ -115,8 +118,7 @@ interface LeaderRow {
 export async function listPeriodLeaders(): Promise<PeriodLeaders> {
   await requireUser();
 
-  const { rows } = await phStocksDb().query<LeaderRow>(PERIOD_LEADERS_SQL, [
-    PSE_INDEX_SYMBOLS,
+  const { rows } = await usStocksDb().query<LeaderRow>(PERIOD_LEADERS_SQL, [
     PERIOD_KEYS,
     PERIOD_UNITS,
     LEADERS_LIMIT,

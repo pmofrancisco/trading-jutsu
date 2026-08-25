@@ -1,6 +1,6 @@
+import PeriodTabs from '@/components/period-tabs';
 import type { IndexPerformance } from '@/features/ph-stocks/data/dto';
 import IndexPerformanceCard from '@/features/ph-stocks/ui/index-performance-card';
-import PeriodTabs from '@/features/ph-stocks/ui/period-tabs';
 
 /**
  * The indices measured over each period, one period at a time.

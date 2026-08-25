@@ -41,5 +41,6 @@ export const paths = {
   usStocks: {
     index: () => '/us-stocks',
     gainersAndLosers: () => '/us-stocks/gainers-and-losers',
+    leaders: () => '/us-stocks/leaders',
   },
 };
