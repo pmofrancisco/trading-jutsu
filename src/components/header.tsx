@@ -77,6 +77,10 @@ const navItems: NavItem[] = [
         href: paths.usStocks.gainersAndLosers(),
         label: 'Gainers and Losers',
       },
+      {
+        href: paths.usStocks.leaders(),
+        label: 'Leaders',
+      },
     ],
   },
 ];
