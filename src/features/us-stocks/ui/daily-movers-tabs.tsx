@@ -12,8 +12,8 @@ import { Tabs } from '@heroui/react';
  *
  * The labels carry no count, unlike the PH page's. There, the number in the tab
  * is how many stocks moved that way; here both lists are capped, so it would
- * only ever read "20" and would say how long the list is rather than anything
- * about the session. The page says what the cap is once, above.
+ * only ever read back the cap and would say how long the list is rather than
+ * anything about the session. The page says what the cap is once, above.
  */
 export default function DailyMoversTabs({
   gainers,
