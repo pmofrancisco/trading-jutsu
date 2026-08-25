@@ -36,6 +36,7 @@ export const paths = {
     index: () => '/ph-stocks',
     gainersAndLosers: () => '/ph-stocks/gainers-and-losers',
     indicesPerformance: () => '/ph-stocks/indices-performance',
+    leaders: () => '/ph-stocks/leaders',
   },
   usStocks: {
     index: () => '/us-stocks',

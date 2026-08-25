@@ -62,6 +62,10 @@ const navItems: NavItem[] = [
         href: paths.phStocks.indicesPerformance(),
         label: 'Indices Performance',
       },
+      {
+        href: paths.phStocks.leaders(),
+        label: 'Leaders',
+      },
     ],
   },
   {

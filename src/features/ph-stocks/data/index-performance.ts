@@ -7,27 +7,8 @@ import type {
   PeriodPerformance,
   PerformancePeriod,
 } from './dto';
+import { PERIOD_KEYS, PERIOD_UNITS } from './periods';
 import { PSE_INDEX_SYMBOLS, PSE_INDICES } from './pse-indices';
-
-/**
- * Where each window starts, as the unit `date_trunc` truncates the newest bar
- * to. This is the whole definition of a period: the query takes the units from
- * here rather than naming any one of them, so another window is this record and
- * the union behind it, not another block of SQL.
- *
- * Postgres truncates a week to the Monday, so the week-to-date cut-off is the
- * Monday of the newest bar's week and the level it measures from is the last bar
- * before it — the previous Friday's close in a full trading week.
- */
-const PERIOD_TRUNC_UNITS: Record<PerformancePeriod, string> = {
-  ytd: 'year',
-  qtd: 'quarter',
-  mtd: 'month',
-  wtd: 'week',
-};
-
-const PERIOD_KEYS = Object.keys(PERIOD_TRUNC_UNITS) as PerformancePeriod[];
-const PERIOD_UNITS = PERIOD_KEYS.map((period) => PERIOD_TRUNC_UNITS[period]);
 
 /**
  * Picks the most recent bar per symbol, and then, for each period, the last bar
