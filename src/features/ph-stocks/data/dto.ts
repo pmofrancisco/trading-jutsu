@@ -72,6 +72,9 @@ export interface DailyMover {
  * The latest session's movers, split by direction and ranked by the size of the
  * move. Stocks that closed unchanged appear in neither list — they moved in no
  * direction, so there is no list they belong at either end of.
+ *
+ * Both lists are capped at `MOVER_LIMIT`: these are the ends of the board for
+ * the session, not every stock that moved over it.
  */
 export interface DailyMovers {
   /**

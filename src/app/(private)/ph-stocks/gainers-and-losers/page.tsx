@@ -1,4 +1,7 @@
-import { listDailyMovers } from '@/features/ph-stocks/data/daily-movers';
+import {
+  listDailyMovers,
+  MOVER_LIMIT,
+} from '@/features/ph-stocks/data/daily-movers';
 import DailyMoversTabs from '@/features/ph-stocks/ui/daily-movers-tabs';
 import { formatDate } from '@/features/ph-stocks/ui/format';
 import { Typography } from '@heroui/react';
@@ -18,14 +21,17 @@ export default async function GainersAndLosers() {
           Gainers and losers
         </Typography.Heading>
         {/* The session is named once here rather than repeated per row: every
-         * figure in both tables is measured over the same one. */}
+         * figure in both tables is measured over the same one. The cap is named
+         * here too — the tabs deliberately carry no count, so this is the only
+         * place a reader is told these are the extremes and not the whole
+         * board. */}
         <p className="text-muted text-sm">
           {/* Not "no market data": `asOf` is also null when the table holds
            * bars but none of them can be priced against an earlier one, and a
            * message that blamed the data would send someone to the wrong
            * place. */}
           {asOf
-            ? `Trading on ${formatDate(asOf)}, against each stock's previous close.`
+            ? `The ${MOVER_LIMIT} biggest moves each way on ${formatDate(asOf)}, against each stock's previous close.`
             : 'No movers to show yet.'}
         </p>
       </div>
