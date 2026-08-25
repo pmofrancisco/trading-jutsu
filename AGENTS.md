@@ -23,15 +23,18 @@ src/
 
 Rules:
 
-- **Only `features/*/data/` may import a database client** — currently just
-  `@/lib/ph-stocks-db`. Nothing in `app/`, `components/`, or `ui/` touches a
-  database.
-- **The one database is not ours.** `@/lib/ph-stocks-db` is a read-only `pg`
-  pool over the PH market data (`market_data`, `PH_STOCKS_DATABASE_URL`), an
-  instance owned and migrated by another application. Never write to it. This
-  app has no schema and no ORM of its own: it reads with hand-written SQL
-  through a plain pool, so nothing here can migrate a table we do not control.
-  Adding a database this app owns means adding that ORM back deliberately.
+- **Only `features/*/data/` may import a database client** — `@/lib/ph-stocks-db`
+  or `@/lib/us-stocks-db`, and a feature reads only its own market's pool.
+  Nothing in `app/`, `components/`, or `ui/` touches a database.
+- **None of the databases are ours.** `@/lib/ph-stocks-db` and
+  `@/lib/us-stocks-db` are read-only `pg` pools over the PH and US market data —
+  a `market_data` table in each, behind `PH_STOCKS_DATABASE_URL` and
+  `US_STOCKS_DATABASE_URL`. They are wholly separate instances, same columns but
+  their own symbols and sessions, so the two never share a pool. Each is owned
+  and migrated by another application; never write to either. This app has no
+  schema and no ORM of its own: it reads with hand-written SQL through plain
+  pools, so nothing here can migrate a table we do not control. Adding a
+  database this app owns means adding that ORM back deliberately.
 - **Every data function calls `requireUser()` first.** Server Actions are
   reachable by direct POST, so the page-level check is not the boundary — the
   data layer is. `PageGuard` is presentation only.
