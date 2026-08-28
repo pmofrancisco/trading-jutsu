@@ -41,6 +41,12 @@ export interface PeriodPerformance {
 export interface IndexPerformance {
   symbol: string;
   name: string;
+  /**
+   * The index's logo, as an absolute URL. Built from the symbol rather than
+   * stored, so it is here for the same reason `name` is: the card should not
+   * have to know where an image lives to display one.
+   */
+  logoUrl: string;
   /** Close of the most recent bar, and the day it is dated. */
   latestClose: number | null;
   asOf: Date | null;
