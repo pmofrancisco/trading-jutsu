@@ -9,6 +9,7 @@ import {
   toneClassName,
 } from '@/features/ph-stocks/ui/format';
 import { Card } from '@heroui/react';
+import Image from 'next/image';
 
 /**
  * How each period is spelled out in the footer. The tab above the card is
@@ -24,6 +25,12 @@ const PERIOD_NAMES: Record<PerformancePeriod, string> = {
 };
 
 /**
+ * How wide the logo is drawn, in pixels. The sources are 250px squares, so this
+ * is the display size `next/image` requests a scaled copy at, not the file's.
+ */
+const LOGO_SIZE = 40;
+
+/**
  * One index's move over one period.
  *
  * The period arrives as a key rather than as the `PeriodPerformance` itself, so
@@ -37,14 +44,35 @@ export default function IndexPerformanceCard({
   performance: IndexPerformance;
   period: PerformancePeriod;
 }) {
-  const { symbol, name, latestClose, asOf, periods } = performance;
+  const { symbol, name, logoUrl, latestClose, asOf, periods } = performance;
   const { baselineClose, baselineDate, changePercent } = periods[period];
 
   return (
     <Card>
-      <Card.Header>
-        <Card.Title>{symbol}</Card.Title>
-        <Card.Description>{name}</Card.Description>
+      {/* `Card.Header` stacks its children, so the row direction is set here
+       * and the two lines are stacked again inside it — the logo sits beside
+       * the pair, not above the name. */}
+      <Card.Header className="flex-row items-center gap-3">
+        {/*
+         * `alt` is empty on purpose: the description below spells the index out
+         * in full right beside it, so naming it again here would have a screen
+         * reader read the same index twice. The logo is decoration.
+         *
+         * The sources are square, and `LOGO_SIZE` is passed rather than set in
+         * CSS because `next/image` requires the intrinsic ratio up front —
+         * `shrink-0` then keeps a long index name from squeezing it.
+         */}
+        <Image
+          alt=""
+          className="shrink-0"
+          height={LOGO_SIZE}
+          src={logoUrl}
+          width={LOGO_SIZE}
+        />
+        <div className="flex flex-col">
+          <Card.Title>{symbol}</Card.Title>
+          <Card.Description>{name}</Card.Description>
+        </div>
       </Card.Header>
       <Card.Content className="gap-1">
         <p
