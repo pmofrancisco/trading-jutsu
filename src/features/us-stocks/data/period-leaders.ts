@@ -1,6 +1,10 @@
 import 'server-only';
 
 import { requireUser } from '@/features/auth/data/session';
+import {
+  usStocksFallbackLogoUrl,
+  usStocksLogoUrl,
+} from '@/lib/us-stocks-assets';
 import { usStocksDb } from '@/lib/us-stocks-db';
 import type { PeriodLeader, PeriodLeaders, PerformancePeriod } from './dto';
 import { PERIOD_KEYS, PERIOD_UNITS } from './periods';
@@ -139,6 +143,7 @@ export async function listPeriodLeaders(): Promise<PeriodLeaders> {
   for (const row of rows) {
     periods[row.period].push({
       symbol: row.symbol,
+      logoUrl: usStocksLogoUrl(row.symbol),
       close: row.close,
       changePercent: row.change_percent,
     });
@@ -147,6 +152,9 @@ export async function listPeriodLeaders(): Promise<PeriodLeaders> {
   return {
     // Every row carries the same session; with no rows there is none to name.
     asOf: rows[0]?.as_of ?? null,
+    // One value for the whole market, so it is resolved here rather
+    // than per row — see `fallbackLogoUrl` on the DTO.
+    fallbackLogoUrl: usStocksFallbackLogoUrl(),
     periods,
   };
 }

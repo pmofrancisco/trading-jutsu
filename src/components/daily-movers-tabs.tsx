@@ -55,10 +55,13 @@ function MoversTabList() {
  * `MoverFormat`.
  */
 export default function DailyMoversTabs({
+  fallbackLogoUrl,
   format,
   gainers,
   losers,
 }: {
+  /** The market's stand-in mark, passed straight through to both tables. */
+  fallbackLogoUrl: string;
   format: MoverFormat;
   gainers: Mover[];
   losers: Mover[];
@@ -69,6 +72,7 @@ export default function DailyMoversTabs({
       <Tabs.Panel id="gainers">
         <MoversTable
           emptyMessage="No stock closed higher in this session."
+          fallbackLogoUrl={fallbackLogoUrl}
           format={format}
           label="Gainers"
           movers={gainers}
@@ -77,6 +81,7 @@ export default function DailyMoversTabs({
       <Tabs.Panel id="losers">
         <MoversTable
           emptyMessage="No stock closed lower in this session."
+          fallbackLogoUrl={fallbackLogoUrl}
           format={format}
           label="Losers"
           movers={losers}

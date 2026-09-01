@@ -16,9 +16,12 @@ import PeriodTabs, { PERIOD_LABELS } from '@/components/period-tabs';
  * `LeaderFormat`.
  */
 export default function PeriodLeadersTabs({
+  fallbackLogoUrl,
   format,
   periods,
 }: {
+  /** The market's stand-in mark, passed straight through to each ranking. */
+  fallbackLogoUrl: string;
   format: LeaderFormat;
   periods: Record<Period, Leader[]>;
 }) {
@@ -30,6 +33,7 @@ export default function PeriodLeadersTabs({
         // drawn from the same record the tab above it is, so the two can only
         // ever say the same word.
         <LeadersTable
+          fallbackLogoUrl={fallbackLogoUrl}
           format={format}
           label={`${PERIOD_LABELS[period]} leaders`}
           leaders={periods[period]}
