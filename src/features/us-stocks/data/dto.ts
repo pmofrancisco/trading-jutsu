@@ -11,6 +11,13 @@
  */
 export interface DailyMover {
   symbol: string;
+  /**
+   * The stock's logo, as an absolute URL. Built from the symbol rather than
+   * stored, and handed over already built because a table should not have to
+   * know where an image lives to display one. Not every symbol has a file
+   * behind it — see `fallbackLogoUrl`.
+   */
+  logoUrl: string;
   /** Close of the latest session. */
   close: number;
   /**
@@ -36,6 +43,13 @@ export interface DailyMovers {
    * bars at all and there is no session to name.
    */
   asOf: Date | null;
+  /**
+   * The stand-in logo for a symbol the bucket has no file for, which most of
+   * the board still is. Carried once here rather than on every row, because it
+   * is one value per market and a hundred rows repeating it would be the same
+   * string a hundred times over the wire.
+   */
+  fallbackLogoUrl: string;
   /** Biggest gain first. */
   gainers: DailyMover[];
   /** Biggest loss first. */
@@ -64,6 +78,13 @@ export type PerformancePeriod = 'ytd' | 'qtd' | 'mtd' | 'wtd';
  */
 export interface PeriodLeader {
   symbol: string;
+  /**
+   * The stock's logo, as an absolute URL. Built from the symbol rather than
+   * stored, and handed over already built because a table should not have to
+   * know where an image lives to display one. Not every symbol has a file
+   * behind it — see `fallbackLogoUrl`.
+   */
+  logoUrl: string;
   /** Close of the latest session. */
   close: number;
   /**
@@ -87,5 +108,12 @@ export interface PeriodLeaders {
    * session can be priced over any window and there is none to name.
    */
   asOf: Date | null;
+  /**
+   * The stand-in logo for a symbol the bucket has no file for, which most of
+   * the board still is. Carried once here rather than on every row, because it
+   * is one value per market and a hundred rows repeating it would be the same
+   * string a hundred times over the wire.
+   */
+  fallbackLogoUrl: string;
   periods: Record<PerformancePeriod, PeriodLeader[]>;
 }

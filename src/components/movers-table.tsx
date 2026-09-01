@@ -1,3 +1,4 @@
+import SymbolLogo, { SYMBOL_LOGO_SIZE } from '@/components/symbol-logo';
 import { Skeleton, Table } from '@heroui/react';
 
 /**
@@ -10,6 +11,8 @@ import { Skeleton, Table } from '@heroui/react';
  */
 export interface Mover {
   symbol: string;
+  /** The stock's own mark; see `fallbackLogoUrl` on the table for the rest. */
+  logoUrl: string;
   close: number;
   change: number;
   changePercent: number;
@@ -72,11 +75,18 @@ function MoversColumns() {
  */
 export default function MoversTable({
   emptyMessage,
+  fallbackLogoUrl,
   format,
   label,
   movers,
 }: {
   emptyMessage: string;
+  /**
+   * The market's stand-in mark, for the rows whose own logo will not load. One
+   * prop rather than a field on every `Mover`, because it is one value per
+   * market — see `fallbackLogoUrl` on both markets' `DailyMovers`.
+   */
+  fallbackLogoUrl: string;
   format: MoverFormat;
   /** Names the table for a screen reader, which the tab above it does not. */
   label: string;
@@ -98,7 +108,19 @@ export default function MoversTable({
               // `id` is what the collection keys the row by; React's own `key`
               // does not reach it.
               <Table.Row id={mover.symbol} key={mover.symbol}>
-                <Table.Cell className="font-medium">{mover.symbol}</Table.Cell>
+                <Table.Cell className="font-medium">
+                  {/* The mark and the symbol are one line: `items-center`
+                   * centres the two against each other rather than seating the
+                   * image on the text's baseline, which a taller box would
+                   * otherwise do. */}
+                  <div className="flex items-center gap-2">
+                    <SymbolLogo
+                      fallbackUrl={fallbackLogoUrl}
+                      src={mover.logoUrl}
+                    />
+                    {mover.symbol}
+                  </div>
+                </Table.Cell>
                 {/* `tabular-nums` so the digits line up column-wise instead of
                  * shifting with the width of each glyph. */}
                 <Table.Cell className="text-end tabular-nums">
@@ -162,7 +184,25 @@ export function MoversTableSkeleton({ label }: { label: string }) {
             {SKELETON_ROWS.map((row) => (
               <Table.Row id={row} key={row}>
                 <Table.Cell>
-                  <Bar className="w-16" />
+                  {/* Laid out like the loaded row's symbol cell, mark and all:
+                   * a logo is taller than the line box of text beside it, so a
+                   * skeleton without one would stand every row up 4px shorter
+                   * and shunt the whole table down when the figures arrive. */}
+                  <div className="flex items-center gap-2">
+                    {/* Round, like the logo it stands in for, so the mark
+                     * does not change shape as the rows land. */}
+                    <Skeleton
+                      className="shrink-0 rounded-full"
+                      // Sized from the constant rather than a matching utility
+                      // class, so the placeholder cannot drift from the image
+                      // it stands in for.
+                      style={{
+                        height: SYMBOL_LOGO_SIZE,
+                        width: SYMBOL_LOGO_SIZE,
+                      }}
+                    />
+                    <Bar className="w-16" />
+                  </div>
                 </Table.Cell>
                 <Table.Cell>
                   {/* `ms-auto` rather than the column's `text-end`: the bar is a

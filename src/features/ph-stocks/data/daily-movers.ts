@@ -1,6 +1,10 @@
 import 'server-only';
 
 import { requireUser } from '@/features/auth/data/session';
+import {
+  phStocksFallbackLogoUrl,
+  phStocksLogoUrl,
+} from '@/lib/ph-stocks-assets';
 import { phStocksDb } from '@/lib/ph-stocks-db';
 import type { DailyMover, DailyMovers } from './dto';
 import { PSE_INDEX_SYMBOLS } from './pse-indices';
@@ -100,6 +104,7 @@ interface MoverRow {
 function toMover(row: MoverRow): DailyMover {
   return {
     symbol: row.symbol,
+    logoUrl: phStocksLogoUrl(row.symbol),
     close: row.close,
     change: row.change,
     changePercent: row.change_percent,
@@ -117,6 +122,9 @@ export async function listDailyMovers(): Promise<DailyMovers> {
   return {
     // Every row carries the same session; with no rows there is none to name.
     asOf: rows[0]?.as_of ?? null,
+    // One value for the whole market, so it is resolved here rather
+    // than per row — see `fallbackLogoUrl` on the DTO.
+    fallbackLogoUrl: phStocksFallbackLogoUrl(),
     // The query has already ranked each direction, so these only split the two
     // halves of the union back apart — re-sorting here would be redundant.
     gainers: rows.filter((row) => row.change > 0).map(toMover),

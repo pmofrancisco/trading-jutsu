@@ -13,10 +13,16 @@ import * as format from '@/features/us-stocks/ui/format';
  * writes its prices with.
  */
 export default function DailyMoversTabs({
+  fallbackLogoUrl,
   gainers,
   losers,
-}: Pick<DailyMovers, 'gainers' | 'losers'>) {
+}: Pick<DailyMovers, 'fallbackLogoUrl' | 'gainers' | 'losers'>) {
   return (
-    <SharedDailyMoversTabs format={format} gainers={gainers} losers={losers} />
+    <SharedDailyMoversTabs
+      fallbackLogoUrl={fallbackLogoUrl}
+      format={format}
+      gainers={gainers}
+      losers={losers}
+    />
   );
 }

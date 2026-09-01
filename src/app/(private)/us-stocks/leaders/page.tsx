@@ -7,7 +7,7 @@ import PeriodLeadersTabs from '@/features/us-stocks/ui/period-leaders-tabs';
 import { Typography } from '@heroui/react';
 
 export default async function Leaders() {
-  const { asOf, periods } = await listPeriodLeaders();
+  const { asOf, fallbackLogoUrl, periods } = await listPeriodLeaders();
 
   return (
     <div className="flex flex-col gap-4">
@@ -35,7 +35,7 @@ export default async function Leaders() {
             : 'No leaders to show yet.'}
         </p>
       </div>
-      <PeriodLeadersTabs periods={periods} />
+      <PeriodLeadersTabs fallbackLogoUrl={fallbackLogoUrl} periods={periods} />
     </div>
   );
 }

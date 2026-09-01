@@ -13,7 +13,14 @@ import * as format from '@/features/us-stocks/ui/format';
  * writes its prices with.
  */
 export default function PeriodLeadersTabs({
+  fallbackLogoUrl,
   periods,
-}: Pick<PeriodLeaders, 'periods'>) {
-  return <SharedPeriodLeadersTabs format={format} periods={periods} />;
+}: Pick<PeriodLeaders, 'fallbackLogoUrl' | 'periods'>) {
+  return (
+    <SharedPeriodLeadersTabs
+      fallbackLogoUrl={fallbackLogoUrl}
+      format={format}
+      periods={periods}
+    />
+  );
 }

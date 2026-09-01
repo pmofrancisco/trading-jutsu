@@ -7,7 +7,7 @@ import { formatDate } from '@/features/us-stocks/ui/format';
 import { Typography } from '@heroui/react';
 
 export default async function GainersAndLosers() {
-  const { asOf, gainers, losers } = await listDailyMovers();
+  const { asOf, fallbackLogoUrl, gainers, losers } = await listDailyMovers();
 
   return (
     <div className="flex flex-col gap-4">
@@ -35,7 +35,11 @@ export default async function GainersAndLosers() {
             : 'No movers to show yet.'}
         </p>
       </div>
-      <DailyMoversTabs gainers={gainers} losers={losers} />
+      <DailyMoversTabs
+        fallbackLogoUrl={fallbackLogoUrl}
+        gainers={gainers}
+        losers={losers}
+      />
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import SymbolLogo from '@/components/symbol-logo';
 import { Table } from '@heroui/react';
 
 /**
@@ -10,6 +11,8 @@ import { Table } from '@heroui/react';
  */
 export interface Leader {
   symbol: string;
+  /** The stock's own mark; see `fallbackLogoUrl` on the table for the rest. */
+  logoUrl: string;
   close: number;
   changePercent: number;
 }
@@ -50,10 +53,17 @@ export interface LeaderFormat {
  * disagree.
  */
 export default function LeadersTable({
+  fallbackLogoUrl,
   format,
   label,
   leaders,
 }: {
+  /**
+   * The market's stand-in mark, for the rows whose own logo will not load. One
+   * prop rather than a field on every `Leader`, because it is one value per
+   * market — see `fallbackLogoUrl` on both markets' `PeriodLeaders`.
+   */
+  fallbackLogoUrl: string;
   format: LeaderFormat;
   /** Names the table for a screen reader, which the tab above it does not. */
   label: string;
@@ -101,7 +111,19 @@ export default function LeadersTable({
                 <Table.Cell className="text-muted text-end tabular-nums">
                   {index + 1}
                 </Table.Cell>
-                <Table.Cell className="font-medium">{leader.symbol}</Table.Cell>
+                <Table.Cell className="font-medium">
+                  {/* The mark and the symbol are one line: `items-center`
+                   * centres the two against each other rather than seating the
+                   * image on the text's baseline, which a taller box would
+                   * otherwise do. */}
+                  <div className="flex items-center gap-2">
+                    <SymbolLogo
+                      fallbackUrl={fallbackLogoUrl}
+                      src={leader.logoUrl}
+                    />
+                    {leader.symbol}
+                  </div>
+                </Table.Cell>
                 <Table.Cell className="text-end tabular-nums">
                   {format.formatPrice(leader.close)}
                 </Table.Cell>

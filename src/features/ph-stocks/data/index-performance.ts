@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { requireUser } from '@/features/auth/data/session';
-import { phStocksIndexLogoUrl } from '@/lib/ph-stocks-assets';
+import { phStocksLogoUrl } from '@/lib/ph-stocks-assets';
 import { phStocksDb } from '@/lib/ph-stocks-db';
 import type {
   IndexPerformance,
@@ -133,7 +133,7 @@ export async function listIndexPerformance(): Promise<IndexPerformance[]> {
     return {
       symbol,
       name,
-      logoUrl: phStocksIndexLogoUrl(symbol),
+      logoUrl: phStocksLogoUrl(symbol),
       latestClose,
       asOf: anyPeriod?.as_of ?? null,
       // Written out rather than built from `PERIOD_KEYS` so the record stays
