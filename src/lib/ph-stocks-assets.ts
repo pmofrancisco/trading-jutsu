@@ -25,10 +25,10 @@ const INDEX_LOGO_PATH = '/storage/v1/object/public/ph/';
  * `phStocksDb` checks its own variable where it does.
  */
 export function phStocksIndexLogoUrl(symbol: string): string {
-  const baseUrl = process.env.PH_STOCKS_ASSETS_BASE_URL;
+  const baseUrl = process.env.SUPABASE_STORAGE_BASE_URL;
 
   if (!baseUrl) {
-    throw new Error('PH_STOCKS_ASSETS_BASE_URL is not set.');
+    throw new Error('SUPABASE_STORAGE_BASE_URL is not set.');
   }
 
   return `${baseUrl}${INDEX_LOGO_PATH}${symbol}.png`;

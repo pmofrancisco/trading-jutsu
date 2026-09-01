@@ -15,12 +15,12 @@ import type { NextConfig } from 'next';
  * `phStocksIndexLogoUrl` — `next.config` is not the place to stop a build over
  * it.
  */
-const phStocksAssetsBaseUrl = process.env.PH_STOCKS_ASSETS_BASE_URL;
+const supabaseStorageBaseUrl = process.env.SUPABASE_STORAGE_BASE_URL;
 
 const nextConfig: NextConfig = {
   images: {
-    remotePatterns: phStocksAssetsBaseUrl
-      ? [new URL(`${phStocksAssetsBaseUrl}/storage/v1/object/public/ph/**`)]
+    remotePatterns: supabaseStorageBaseUrl
+      ? [new URL(`${supabaseStorageBaseUrl}/storage/v1/object/public/ph/**`)]
       : [],
   },
 };
