@@ -10,9 +10,10 @@ import { Skeleton, Typography } from '@heroui/react';
  * and so are the two tabs. Only the summary and the rows, which are the
  * session's to say, come through as placeholders.
  *
- * Shared by both markets' routes rather than written per market, because
+ * Shared by every market's route rather than written per market, because
  * nothing a skeleton shows is market-specific: the locale only matters once
- * there are figures to write in it.
+ * there are figures to write in it, and the wording that does differ between
+ * the markets is the empty-list message, which a loading page never shows.
  */
 export default function DailyMoversLoading() {
   return (

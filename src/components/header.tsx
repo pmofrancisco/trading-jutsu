@@ -38,8 +38,8 @@ interface NavItem {
  * colour and need no sizing of their own.
  *
  * A section's pages are nested under it rather than promoted to the top level:
- * the bar has room for a handful of items, and the two market sections have
- * pages of their own.
+ * the bar has room for a handful of items, and the market sections have pages
+ * of their own.
  *
  * `/` is deliberately absent. It is the public landing page, and this header
  * only ever renders for someone who is past it — Dashboard is where the app
@@ -47,7 +47,17 @@ interface NavItem {
  */
 const navItems: NavItem[] = [
   { href: paths.dashboard(), label: 'Dashboard', Icon: LayoutCells },
-  { href: paths.crypto.index(), label: 'Crypto', Icon: Cubes3 },
+  {
+    href: paths.crypto.index(),
+    label: 'Crypto',
+    Icon: Cubes3,
+    pages: [
+      {
+        href: paths.crypto.gainersAndLosers(),
+        label: 'Gainers and Losers',
+      },
+    ],
+  },
   { href: paths.forex.index(), label: 'Forex', Icon: ArrowRightArrowLeft },
   {
     href: paths.phStocks.index(),
