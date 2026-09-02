@@ -46,32 +46,45 @@ function MoversTabList() {
  * figures need. `Tabs` keeps its own selection state internally, so this stays a
  * Server Component — the only props crossing the boundary are strings.
  *
- * The labels carry no count. Both markets cap their lists, so a count would only
+ * The labels carry no count. Every market caps its list, so a count would only
  * ever read back the cap and would say how long the list is rather than anything
- * about the session. Each page says what its cap is once, above.
+ * about the day it covers. Each page says what its cap is once, above.
  *
- * Shared rather than one copy per market: what differs between the two pages is
- * the locale the figures are written in, and that arrives as `format` — see
- * `MoverFormat`.
+ * Shared rather than one copy per market: what differs between the pages is the
+ * locale the figures are written in, which arrives as `format` — see
+ * `MoverFormat` — and what an empty list is called, which arrives as the two
+ * messages below.
  */
 export default function DailyMoversTabs({
   fallbackLogoUrl,
   format,
   gainers,
+  gainersEmptyMessage = 'No stock closed higher in this session.',
   losers,
+  losersEmptyMessage = 'No stock closed lower in this session.',
 }: {
   /** The market's stand-in mark, passed straight through to both tables. */
   fallbackLogoUrl: string;
   format: MoverFormat;
   gainers: Mover[];
+  /**
+   * What an empty list is called, per direction.
+   *
+   * Optional, defaulting to the stock markets' wording, because that is what
+   * two of the three callers want and a market that shares the phrasing should
+   * not have to restate it. Crypto passes its own: it has no stocks, and no
+   * session either — it never closes, so what these tables rank is a UTC day.
+   */
+  gainersEmptyMessage?: string;
   losers: Mover[];
+  losersEmptyMessage?: string;
 }) {
   return (
     <Tabs>
       <MoversTabList />
       <Tabs.Panel id="gainers">
         <MoversTable
-          emptyMessage="No stock closed higher in this session."
+          emptyMessage={gainersEmptyMessage}
           fallbackLogoUrl={fallbackLogoUrl}
           format={format}
           label="Gainers"
@@ -80,7 +93,7 @@ export default function DailyMoversTabs({
       </Tabs.Panel>
       <Tabs.Panel id="losers">
         <MoversTable
-          emptyMessage="No stock closed lower in this session."
+          emptyMessage={losersEmptyMessage}
           fallbackLogoUrl={fallbackLogoUrl}
           format={format}
           label="Losers"

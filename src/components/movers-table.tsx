@@ -5,9 +5,9 @@ import { Skeleton, Table } from '@heroui/react';
  * One stock's move over a session, as a table renders it.
  *
  * Declared here rather than imported from a feature, because a shared component
- * may not reach into one — see the layering rules in `AGENTS.md`. Both markets'
- * `DailyMover` DTOs satisfy this structurally, so each feature still hands over
- * its own type and nothing is cast.
+ * may not reach into one — see the layering rules in `AGENTS.md`. Every
+ * market's `DailyMover` DTO satisfies this structurally, so each feature still
+ * hands over its own type and nothing is cast.
  */
 export interface Mover {
   symbol: string;
@@ -84,7 +84,7 @@ export default function MoversTable({
   /**
    * The market's stand-in mark, for the rows whose own logo will not load. One
    * prop rather than a field on every `Mover`, because it is one value per
-   * market — see `fallbackLogoUrl` on both markets' `DailyMovers`.
+   * market — see `fallbackLogoUrl` on every market's `DailyMovers`.
    */
   fallbackLogoUrl: string;
   format: MoverFormat;
