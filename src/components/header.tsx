@@ -56,6 +56,10 @@ const navItems: NavItem[] = [
         href: paths.crypto.gainersAndLosers(),
         label: 'Gainers and Losers',
       },
+      {
+        href: paths.crypto.leaders(),
+        label: 'Leaders',
+      },
     ],
   },
   { href: paths.forex.index(), label: 'Forex', Icon: ArrowRightArrowLeft },

@@ -29,6 +29,7 @@ export const paths = {
   crypto: {
     index: () => '/crypto',
     gainersAndLosers: () => '/crypto/gainers-and-losers',
+    leaders: () => '/crypto/leaders',
   },
   forex: {
     index: () => '/forex',

@@ -20,7 +20,7 @@ export const LEADERS_LIMIT = 50;
 
 /**
  * The stocks that traded in the latest session, ranked by how far they have
- * come since the start of each period.
+ * risen since the start of each period.
  *
  * The session is taken the way `daily-movers` takes it — the newest timestamp
  * among the stocks — rather than each symbol's own newest bar: this ranks the
@@ -45,6 +45,12 @@ export const LEADERS_LIMIT = 50;
  * the join — has no place in a ranking at all. `row_number()` cuts each period
  * to `LEADERS_LIMIT` inside the query, so only the rows that are displayed are
  * built and returned.
+ *
+ * Only gains are ranked. A board of the smallest losses is a different page
+ * from the one this heading promises, so a symbol that is flat or down over a
+ * window drops out of that window's ranking rather than filling the bottom of
+ * it. A ranking is therefore as long as the window has gainers, up to
+ * `LEADERS_LIMIT`, and empty in a window nothing on the board rose over.
  *
  * `::float8` converts Postgres `numeric` — which node-postgres would otherwise
  * hand back as a string — into a JavaScript number.
@@ -100,10 +106,17 @@ const PERIOD_LEADERS_SQL = `
       LIMIT 1
     ) b ON true
     -- A zero baseline would divide to Infinity, which sorts above every real
-    -- move and would head the ranking. Filtered here rather than after the
-    -- window, because Postgres applies WHERE before row_number() and the rank
-    -- must not count a row the page never shows.
+    -- move and would head the ranking.
     WHERE b.close <> 0
+      -- A leader has to have led: a flat or falling symbol is not one, however
+      -- near the top of a falling board it sits. The same expression the window
+      -- orders by, so what is ranked and what is kept cannot disagree.
+      --
+      -- Both tests sit before row_number() rather than after it, because
+      -- Postgres applies WHERE first and the rank must not count a row the page
+      -- never shows: filtered afterwards, a window whose three biggest movers
+      -- were all losses would open at rank 4.
+      AND (l.close - b.close) / b.close > 0
   )
   SELECT r.period, r.symbol, r.close, r.change_percent, s.ts AS as_of
   FROM ranked r, session s
