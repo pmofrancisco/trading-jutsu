@@ -33,6 +33,7 @@ export const paths = {
   },
   forex: {
     index: () => '/forex',
+    gainersAndLosers: () => '/forex/gainers-and-losers',
   },
   phStocks: {
     index: () => '/ph-stocks',
