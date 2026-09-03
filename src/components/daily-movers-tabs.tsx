@@ -71,9 +71,10 @@ export default function DailyMoversTabs({
    * What an empty list is called, per direction.
    *
    * Optional, defaulting to the stock markets' wording, because that is what
-   * two of the three callers want and a market that shares the phrasing should
-   * not have to restate it. Crypto passes its own: it has no stocks, and no
-   * session either — it never closes, so what these tables rank is a UTC day.
+   * two of the four callers want and a market that shares the phrasing should
+   * not have to restate it. Crypto and forex pass their own: neither has
+   * stocks, and neither has a session either — one never closes and the other
+   * has no closing bell, so what these tables rank is a UTC day.
    */
   gainersEmptyMessage?: string;
   losers: Mover[];

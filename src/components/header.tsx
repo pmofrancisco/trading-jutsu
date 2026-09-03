@@ -62,7 +62,17 @@ const navItems: NavItem[] = [
       },
     ],
   },
-  { href: paths.forex.index(), label: 'Forex', Icon: ArrowRightArrowLeft },
+  {
+    href: paths.forex.index(),
+    label: 'Forex',
+    Icon: ArrowRightArrowLeft,
+    pages: [
+      {
+        href: paths.forex.gainersAndLosers(),
+        label: 'Gainers and Losers',
+      },
+    ],
+  },
   {
     href: paths.phStocks.index(),
     label: 'PH Stocks',
