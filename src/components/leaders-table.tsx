@@ -2,11 +2,11 @@ import SymbolLogo from '@/components/symbol-logo';
 import { Table } from '@heroui/react';
 
 /**
- * One stock's standing in a period's ranking, as a table renders it.
+ * One symbol's standing in a period's ranking, as a table renders it.
  *
  * Declared here rather than imported from a feature, because a shared component
- * may not reach into one — see the layering rules in `AGENTS.md`. Both markets'
- * `PeriodLeader` DTOs satisfy this structurally, so each feature still hands
+ * may not reach into one — see the layering rules in `AGENTS.md`. Every market's
+ * `PeriodLeader` DTO satisfies this structurally, so each feature still hands
  * over its own type and nothing is cast.
  */
 export interface Leader {
@@ -43,21 +43,25 @@ export interface LeaderFormat {
  * because a function cannot be serialised, so the rows are mapped here and the
  * empty case is answered before the table is reached at all.
  *
- * The empty message is written here rather than taken as a prop, unlike
- * `MoversTable`'s: that table is rendered twice with a different sentence each
- * time, and this one has a single case to describe — a window no stock on the
- * board has the history to be ranked over, which reads the same in every market.
+ * The empty message arrives as a prop, the way `MoversTable`'s does. There is
+ * only ever the one case to describe — a window nothing on the board has the
+ * history to be ranked over — but what is on the board differs: two of the three
+ * markets list stocks and the third lists coins, and the sentence names them.
+ * The default sits on the caller above, so a market that shares the phrasing
+ * does not restate it.
  *
  * The rank is the row's position rather than a figure carried on it: the list
  * arrives ranked, and numbering it here is the one place the two cannot
  * disagree.
  */
 export default function LeadersTable({
+  emptyMessage,
   fallbackLogoUrl,
   format,
   label,
   leaders,
 }: {
+  emptyMessage: string;
   /**
    * The market's stand-in mark, for the rows whose own logo will not load. One
    * prop rather than a field on every `Leader`, because it is one value per
@@ -70,11 +74,7 @@ export default function LeadersTable({
   leaders: Leader[];
 }) {
   if (leaders.length === 0) {
-    return (
-      <p className="text-muted p-2 text-sm">
-        No stock has enough history to be ranked over this period.
-      </p>
-    );
+    return <p className="text-muted p-2 text-sm">{emptyMessage}</p>;
   }
 
   return (
@@ -127,9 +127,11 @@ export default function LeadersTable({
                 <Table.Cell className="text-end tabular-nums">
                   {format.formatPrice(leader.close)}
                 </Table.Cell>
-                {/* Coloured by sign rather than by rank: in a period the whole
-                 * board spent falling, the leaders are the smallest losses, and
-                 * a red figure is the honest way to say so. */}
+                {/* Coloured by sign rather than by rank. Every figure a
+                 * ranking holds is a gain — the queries drop the flat and the
+                 * falling — so in practice this is always the up tone; it is
+                 * still asked for rather than hardcoded, because the table is
+                 * handed a `Leader` and cannot see what filtered it. */}
                 <Table.Cell
                   className={`text-end font-medium tabular-nums ${format.toneClassName(leader.changePercent)}`}
                 >

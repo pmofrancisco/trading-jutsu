@@ -30,10 +30,10 @@ const PERIODS = Object.keys(PERIOD_LABELS) as Period[];
 /**
  * The same four windows, whatever is being measured over them.
  *
- * Three pages ask this question — the PSE indices priced over each period, and
- * each market's stocks ranked over them — and before this the strip was written
+ * Four pages ask this question — the PSE indices priced over each period, and
+ * each market's board ranked over them — and before this the strip was written
  * out per page, four tabs and four panels apiece, so a fifth window would have
- * been a change in three places instead of one. Shared rather than owned by one
+ * been a change in four places instead of one. Shared rather than owned by one
  * market for the reason `movers-table` is: the markup is the same everywhere,
  * and what differs — the figures, and the locale they are written in — arrives
  * from the panel each caller renders.

@@ -28,10 +28,11 @@ export default async function Leaders() {
          * ranking on the page is measured to the same one. */}
         <p className="text-muted text-sm">
           {/* Not "no market data": `asOf` is also null when the table holds
-           * bars but none of them can be measured over a window, and a message
-           * that blamed the data would send someone to the wrong place. */}
+           * bars but nothing gained over any window — unmeasurable, or simply
+           * down — and a message that blamed the data would send someone to the
+           * wrong place. */}
           {asOf
-            ? `The ${LEADERS_LIMIT} biggest movers since the start of each period, up to trading on ${formatDate(asOf)}.`
+            ? `The ${LEADERS_LIMIT} biggest gains since the start of each period, up to trading on ${formatDate(asOf)}.`
             : 'No leaders to show yet.'}
         </p>
       </div>

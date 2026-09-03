@@ -1,9 +1,9 @@
 import {
   LEADERS_LIMIT,
   listPeriodLeaders,
-} from '@/features/us-stocks/data/period-leaders';
-import { formatDate } from '@/features/us-stocks/ui/format';
-import PeriodLeadersTabs from '@/features/us-stocks/ui/period-leaders-tabs';
+} from '@/features/crypto/data/period-leaders';
+import { formatDate } from '@/features/crypto/ui/format';
+import PeriodLeadersTabs from '@/features/crypto/ui/period-leaders-tabs';
 import { Typography } from '@heroui/react';
 
 export default async function Leaders() {
@@ -24,15 +24,17 @@ export default async function Leaders() {
         <Typography.Heading className="text-2xl" level={1} weight="bold">
           Leaders
         </Typography.Heading>
-        {/* The session is named once here rather than repeated per row: every
-         * ranking on the page is measured to the same one. */}
+        {/* The day is named once here rather than repeated per row: every
+         * ranking on the page is measured to the same one. It is named as a
+         * date and not as trading, the way the stock pages name it: crypto
+         * never closes, so what these rankings end at is a UTC day. */}
         <p className="text-muted text-sm">
           {/* Not "no market data": `asOf` is also null when the table holds
            * bars but nothing gained over any window — unmeasurable, or simply
            * down — and a message that blamed the data would send someone to the
            * wrong place. */}
           {asOf
-            ? `The ${LEADERS_LIMIT} biggest gains since the start of each period, up to trading on ${formatDate(asOf)}.`
+            ? `The ${LEADERS_LIMIT} biggest gains since the start of each period, up to ${formatDate(asOf)}.`
             : 'No leaders to show yet.'}
         </p>
       </div>

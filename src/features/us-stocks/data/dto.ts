@@ -91,6 +91,10 @@ export interface PeriodLeader {
    * The move from the last close before the period began, as a percentage of
    * it. That baseline is not here: it is what the figure is measured from, not
    * something the table shows.
+   *
+   * Always positive: a ranking holds only what gained over the window — see
+   * `listPeriodLeaders`. The type cannot say so, which is why the table it
+   * feeds still colours the figure by its sign rather than assuming one.
    */
   changePercent: number;
 }
@@ -105,7 +109,8 @@ export interface PeriodLeader {
 export interface PeriodLeaders {
   /**
    * The session every ranking ends at, or `null` when no stock in the latest
-   * session can be priced over any window and there is none to name.
+   * session gained over any window — whether because none can be priced over
+   * one or because the board fell across all four — and there is none to name.
    */
   asOf: Date | null;
   /**
