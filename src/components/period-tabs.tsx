@@ -1,3 +1,4 @@
+import PeriodTabsRoot from '@/components/period-tabs-root';
 import { Tabs } from '@heroui/react';
 import type { ReactNode } from 'react';
 
@@ -44,11 +45,12 @@ const PERIODS = Object.keys(PERIOD_LABELS) as Period[];
  * function so that a panel cannot be built for the wrong window — the period a
  * caller renders is the period it was handed, not one it names again.
  *
- * Every panel is rendered on the server, so switching tabs costs no fetch, and
- * `Tabs` keeps its selection state internally — which is what leaves every
- * caller a Server Component. The first tab is the one it opens on: the year is
- * the figure these pages lead with, and the shorter windows are read against
- * it.
+ * Every panel is rendered on the server, so switching tabs costs no fetch. The
+ * selection lives in the URL — see `PeriodTabsRoot` — and is read there on the
+ * client, which is what leaves every caller a Server Component with nothing to
+ * thread through from its page. The first tab is the one it opens on when the
+ * URL names none: the year is the figure these pages lead with, and the shorter
+ * windows are read against it.
  */
 export default function PeriodTabs({
   label,
@@ -59,7 +61,7 @@ export default function PeriodTabs({
   children: (period: Period) => ReactNode;
 }) {
   return (
-    <Tabs>
+    <PeriodTabsRoot periods={PERIODS}>
       {/* `self-start` so the pill is only as wide as the tabs; the tab list
        * would otherwise stretch across the page, which the column layout of
        * `Tabs` makes it do by default. */}
@@ -83,6 +85,6 @@ export default function PeriodTabs({
           {children(period)}
         </Tabs.Panel>
       ))}
-    </Tabs>
+    </PeriodTabsRoot>
   );
 }
