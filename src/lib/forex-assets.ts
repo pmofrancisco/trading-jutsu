@@ -30,11 +30,13 @@ const LOGO_PATH = '/storage/v1/object/public/forex/';
 /**
  * The symbol whose logo stands in when a pair has none of its own.
  *
- * The bucket is filled in as logos are drawn, and with better than twelve
- * hundred pairs on this board most of them are still waiting, so a missing file
- * is the ordinary case rather than the broken one. `FX.png` is a generic mark
- * kept for exactly this, the way the US market's `US.png` is, rather than any
- * particular pair's — no symbol collides with it.
+ * The bucket is filled in as logos are drawn, and this board is far enough
+ * along that most pairs have one — today fifteen of the seventy-one are still
+ * waiting, the crosses rather than the majors. So a missing file is the
+ * exception here, unlike on the bigger boards, but a common enough one to
+ * design for: `NOKSEK` has led a ranking with no mark of its own. `FX.png` is a
+ * generic mark kept for exactly this, the way the US market's `US.png` is,
+ * rather than any particular pair's — no symbol collides with it.
  */
 const FALLBACK_LOGO_SYMBOL = 'FX';
 

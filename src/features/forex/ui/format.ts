@@ -16,20 +16,23 @@
  * write.
  *
  * A rate is one currency counted in another, and the two ends of this board are
- * far apart: gold in Argentine pesos closes near 6,623,660 while the Lebanese
- * pound against the dollar sits at 0.000011, and 138 of the 1,205 pairs in the
- * latest bar close below a cent. Fixed decimal places cannot serve both ends:
- * the four the stock markets round to would print every pair under 0.0001 as
- * `0.0000` — a rate that reads as worthless rather than as small, and there are
- * fourteen of them — while enough places to write those would hang six dead
- * zeros off gold.
+ * far apart: gold in yen closes near 667,603 while the New Zealand dollar
+ * against the franc sits at 0.47, six orders of magnitude below it. Fixed
+ * decimal places cannot serve both ends. Two — enough for gold — would round a
+ * weak currency's rate away to a figure that reads as worthless rather than as
+ * small, while enough places to write one of those would hang dead zeros off
+ * gold. Which end the board actually reaches is the loader's to decide and has
+ * changed before: it has carried pairs quoting below 0.0001 in the past and
+ * quotes none today, so the formatter is written for the range rather than for
+ * the current roster.
  *
  * So the significant figures are what is fixed, and the decimal places follow,
  * the way `features/crypto` handles the same problem. `roundingPriority:
  * 'morePrecision'` runs both constraints and keeps whichever writes more: above
- * 1 the two decimal places win and a rate reads as money — 6,623,660.30 — while
+ * 1 the two decimal places win and a rate reads as money — 667,603.20 — while
  * below it the four significant figures win and a weak currency keeps its
- * resolution — 0.00001100. Four figures because that is what the comparison
+ * resolution — 0.4740, and 0.00001100 for a rate that needs it. Four figures
+ * because that is what the comparison
  * this page exists for needs; a fifth is noise at every scale on the board.
  */
 const priceFormatter = new Intl.NumberFormat('en-US', {

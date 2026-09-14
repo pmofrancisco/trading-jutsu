@@ -26,8 +26,9 @@ export default function PeriodLeadersTabs({
    * What an empty ranking is called.
    *
    * Optional, defaulting to the stock markets' wording, because that is what
-   * two of the three callers want and a market that shares the phrasing should
-   * not have to restate it. Crypto passes its own: it has no stocks.
+   * two of the four callers want and a market that shares the phrasing should
+   * not have to restate it. Crypto and forex pass their own: neither has
+   * stocks.
    *
    * It says nothing gained rather than nothing has the history to be ranked,
    * because both are now reasons a ranking is empty and the falling board is
