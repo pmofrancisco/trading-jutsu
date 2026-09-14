@@ -8,10 +8,11 @@ import type { DailyMover, DailyMovers } from './dto';
 /**
  * How many movers each list holds.
  *
- * A movers page is the ends of the board, not the whole of it. This table
- * carries better than twelve hundred pairs, so an uncapped page would ship a
- * row for each of them to show the handful anyone came to read. Fifty, the same
- * depth every other market caps its lists at.
+ * A movers page is the ends of the board, not the whole of it. This board is
+ * the smallest of the four — a little over seventy pairs — so the cut rarely
+ * bites today; it is here because the loader decides how many pairs there are
+ * and the page should not change shape when it adds some. Fifty, the same depth
+ * every other market caps its lists at.
  */
 export const MOVER_LIMIT = 50;
 
@@ -35,12 +36,12 @@ export const MOVER_LIMIT = 50;
  * rather than the day before it: a pair the loader missed yesterday is still up
  * or down against whenever it last had a bar. Worth knowing when reading the
  * output: that bar is only as recent as the loader has been running, and this
- * table is sparse behind the last few days — today it holds four recent ones
- * and two year-ends and nothing between — so a pair whose previous bar falls
+ * table's history has a hole behind that run — today it is dense back to May
+ * and then nothing but two year-end bars — so a pair whose previous bar falls
  * the far side of a gap is measured across the whole of it, and its move can be
- * far larger than one day's. The
- * alternative — pinning every row to the previous *day* — would report a
- * uniform window but drop every pair that has no bar in it.
+ * far larger than one day's. The alternative — pinning every row to the
+ * previous *day* — would report a uniform window but drop every pair that has
+ * no bar in it.
  *
  * The ranking happens here rather than in TypeScript so that the two `LIMIT`s
  * decide what crosses the wire: a hundred rows arrive instead of the whole

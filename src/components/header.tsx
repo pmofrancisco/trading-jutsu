@@ -71,6 +71,10 @@ const navItems: NavItem[] = [
         href: paths.forex.gainersAndLosers(),
         label: 'Gainers and Losers',
       },
+      {
+        href: paths.forex.leaders(),
+        label: 'Leaders',
+      },
     ],
   },
   {
