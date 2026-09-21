@@ -1,6 +1,6 @@
 import 'server-only';
 
-import type { PerformancePeriod } from './dto';
+import type { PeriodSpan, PerformancePeriod } from './dto';
 
 /**
  * Where each window starts, as the unit `date_trunc` truncates the newest bar
@@ -40,3 +40,16 @@ export const PERIOD_KEYS = Object.keys(
 export const PERIOD_UNITS = PERIOD_KEYS.map(
   (period) => PERIOD_TRUNC_UNITS[period],
 );
+
+/**
+ * The spans as the `text[]` parameter the query `unnest`s into a row apiece,
+ * crossed with the periods above to make the eight windows the page holds.
+ *
+ * A list rather than a record, because a span needs no unit of its own: the
+ * previous turn of a window is found by truncating to the same unit a day
+ * before the current one opens, which is one expression for all four periods —
+ * Postgres has no `interval '1 quarter'` to subtract, and needs none. The
+ * query names the two spans it branches on, so this is the order they are
+ * measured in and `PeriodSpan` says why `current` leads.
+ */
+export const PERIOD_SPANS: PeriodSpan[] = ['current', 'previous'];
