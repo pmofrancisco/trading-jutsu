@@ -229,7 +229,14 @@ interface LeaderRow {
   year: number;
   month: number;
   measurable: boolean;
-  as_of: Date;
+  /**
+   * Null — along with `starts_at`, `year` and `month` — only when the board
+   * holds no bars at all, because every window is then truncated from a session
+   * that does not exist. Those three are typed as though they were not, because
+   * `listPeriodLeaders` returns before reading one: they are non-null exactly
+   * when this is.
+   */
+  as_of: Date | null;
   symbol: string | null;
   close: number | null;
   change_percent: number | null;
@@ -250,9 +257,13 @@ export async function listPeriodLeaders(): Promise<PeriodLeaders> {
   // — see `fallbackLogoUrl` on the DTO.
   const fallbackLogoUrl = phStocksFallbackLogoUrl();
 
-  // No rows at all means `market_data` holds no stock bars: `session` finds no
-  // bar, so there is nothing to date the windows by and no window to describe.
-  if (rows.length === 0) {
+  // The eight windows are crossed from the parameters rather than built from
+  // the data, so they come back even from a board that has none — a row count
+  // says nothing here. What says the table is empty is the session itself,
+  // which is null exactly when there was no bar to take it from.
+  const asOf = rows[0]?.as_of ?? null;
+
+  if (asOf === null) {
     return { asOf: null, fallbackLogoUrl, periods: null };
   }
 
@@ -336,10 +347,5 @@ export async function listPeriodLeaders(): Promise<PeriodLeaders> {
     },
   };
 
-  return {
-    // Every row carries the same session — it is the board's, not a ranking's.
-    asOf: rows[0].as_of,
-    fallbackLogoUrl,
-    periods,
-  };
+  return { asOf, fallbackLogoUrl, periods };
 }
