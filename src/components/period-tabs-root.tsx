@@ -1,7 +1,7 @@
 'use client';
 
+import { useUrlParam } from '@/components/url-param';
 import { Tabs } from '@heroui/react';
-import { usePathname, useSearchParams } from 'next/navigation';
 import type { Key, ReactNode } from 'react';
 import { useState } from 'react';
 
@@ -12,25 +12,15 @@ const PERIOD_PARAM = 'period';
  * `Tabs` with its selection kept in the URL, so a refresh, a bookmark or a
  * shared link opens on the window it was left on.
  *
- * The URL is the only state: the selected tab is read from `?period=` on every
- * render, and choosing one writes it back. There is no copy in React state to
- * fall out of step with the address bar.
- *
- * It is written with `window.history.replaceState` rather than the router.
- * Next syncs `useSearchParams` with the native History API without a request,
- * whereas a router navigation would render the page on the server again and
- * rerun a query whose results — every window's — are already on the page.
- * Replace rather than push, so Back leaves the page instead of stepping through
- * the tabs clicked on it.
+ * `useUrlParam` holds that selection — see it for why the URL is the only state
+ * and why it is written with `replaceState` rather than the router. All this
+ * adds is the indicator's transition, which is a `Tabs` problem and not a URL
+ * one.
  *
  * `periods` arrives as a prop rather than imported from `period-tabs`, which
  * renders this: the two would import each other. Its first entry is the
  * default, the tab an unknown or missing parameter falls back to, and the one
  * written as no parameter at all — so the bare URL still means what it did.
- *
- * The routes this renders on are dynamic — the private layout reads the
- * session — so `useSearchParams` has the request's parameters during the server
- * render, and the right tab is selected before hydration rather than after it.
  */
 export default function PeriodTabsRoot({
   children,
@@ -39,14 +29,7 @@ export default function PeriodTabsRoot({
   children: ReactNode;
   periods: string[];
 }) {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const [defaultPeriod] = periods;
-  const requested = searchParams.get(PERIOD_PARAM);
-  const selected =
-    requested !== null && periods.includes(requested)
-      ? requested
-      : defaultPeriod;
+  const [selected, selectPeriod] = useUrlParam(PERIOD_PARAM, periods);
 
   /*
    * Whether the pill behind the selected tab may slide, which it may not until
@@ -72,20 +55,7 @@ export default function PeriodTabsRoot({
 
   function select(key: Key) {
     setCanSlide(true);
-    // Built from the current parameters rather than from scratch, so whatever
-    // else the URL carries survives a tab switch.
-    const params = new URLSearchParams(searchParams.toString());
-    if (key === defaultPeriod) {
-      params.delete(PERIOD_PARAM);
-    } else {
-      params.set(PERIOD_PARAM, String(key));
-    }
-    const query = params.toString();
-    window.history.replaceState(
-      null,
-      '',
-      query ? `${pathname}?${query}` : pathname,
-    );
+    selectPeriod(String(key));
   }
 
   return (

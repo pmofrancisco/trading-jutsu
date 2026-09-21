@@ -67,6 +67,22 @@ export interface DailyMovers {
 export type PerformancePeriod = 'ytd' | 'qtd' | 'mtd' | 'wtd';
 
 /**
+ * Which turn of a period is being measured — the one in progress, or the one
+ * before it.
+ *
+ * A second dimension on the windows above rather than four more periods,
+ * because it is the same four windows asked of a different turn: `qtd` and
+ * `previous` is the quarter before this one, measured end to end. The current
+ * span runs to the latest bar and is still moving; a previous span is a
+ * finished period, opening where its own turn began and closing where the
+ * current one starts.
+ *
+ * `current` first, for the reason the periods are ordered as they are: it is
+ * the default, and the one a reader arrives wanting.
+ */
+export type PeriodSpan = 'current' | 'previous';
+
+/**
  * One stock's standing in a period's ranking.
  *
  * Nothing here is nullable, for the same reason nothing on `DailyMover` is: a
@@ -100,19 +116,72 @@ export interface PeriodLeader {
 }
 
 /**
+ * One window — a period and a span — and what it ranks.
+ *
+ * The window is described as well as filled, because a ranking alone cannot say
+ * which turn of the period it is: two `qtd` tables are the same four columns,
+ * and only the dates tell the quarter that is running from the one before it.
+ */
+export interface PeriodWindow {
+  /**
+   * When the window opens. The level its figures are measured from is the last
+   * close before this, not a close at it.
+   */
+  start: Date;
+  /**
+   * The calendar year and month (1-12) the window opens in, counted in the zone
+   * this market's bars are truncated in — `America/New_York`, not the server's.
+   *
+   * Carried as numbers beside `start` rather than derived from it in the UI:
+   * the zone is a fact of the data layer — see the note on `PERIOD_TRUNC_UNITS`
+   * — and it matters most here, where a bar is dated at the closing bell. A
+   * render context that recomputed the calendar in UTC would file an evening
+   * close under the following day and could name a window a day out.
+   */
+  year: number;
+  month: number;
+  /**
+   * Whether the table holds any bar the window could open from — that is,
+   * whether there is a close in the week before `start`.
+   *
+   * Needed because an empty ranking has two quite different causes, and a page
+   * that could not tell them apart would blame the board for both. This
+   * database keeps a rolling window of recent sessions rather than the whole
+   * history, so a period far enough back has nothing to measure from at all:
+   * that is not a board on which nothing gained, and saying so would be wrong.
+   */
+  measurable: boolean;
+  /** Biggest gain first; empty when nothing gained, or nothing could be. */
+  leaders: PeriodLeader[];
+}
+
+/**
  * The strongest performers over each window, biggest gain first.
  *
- * Keyed by period rather than held as one list with a period on every row,
- * because that is how the page reads it — one tab, one ranking — and because a
- * record keyed on the union cannot be built with a window missing.
+ * Keyed by period and then by span rather than held as one list with both on
+ * every row, because that is how the page reads it — one tab and one toggle,
+ * one ranking — and because a record keyed on the unions cannot be built with a
+ * window missing.
+ *
+ * Two shapes rather than one with nullable fields, because the two cases are
+ * not the same question. With bars in the table there is always a session to
+ * name and always eight windows to describe, however few of them anything
+ * gained over; with none there is neither, and a window with no date is not a
+ * window. Discriminating on `asOf` means the page's existing check for an empty
+ * board is also what narrows `periods` to something it can render, so neither
+ * can be read without the other having been asked about.
  */
-export interface PeriodLeaders {
+export interface RankedPeriodLeaders {
   /**
-   * The session every ranking ends at, or `null` when no stock in the latest
-   * session gained over any window — whether because none can be priced over
-   * one or because the board fell across all four — and there is none to name.
+   * The latest session on the board.
+   *
+   * It dates the current spans, which run up to it; a previous span closes
+   * where the current one opens and is dated by its own window instead. Unlike
+   * the figure this replaced it is the session the data reaches, not the one a
+   * ranking reached: a board on which nothing gained still has a latest
+   * session, and the page no longer mistakes the one for the other.
    */
-  asOf: Date | null;
+  asOf: Date;
   /**
    * The stand-in logo for a symbol the bucket has no file for, which most of
    * the board still is. Carried once here rather than on every row, because it
@@ -120,5 +189,17 @@ export interface PeriodLeaders {
    * string a hundred times over the wire.
    */
   fallbackLogoUrl: string;
-  periods: Record<PerformancePeriod, PeriodLeader[]>;
+  periods: Record<PerformancePeriod, Record<PeriodSpan, PeriodWindow>>;
 }
+
+/**
+ * A board with no bars at all, which has neither a session nor a window to
+ * name.
+ */
+export interface EmptyPeriodLeaders {
+  asOf: null;
+  fallbackLogoUrl: string;
+  periods: null;
+}
+
+export type PeriodLeaders = RankedPeriodLeaders | EmptyPeriodLeaders;
