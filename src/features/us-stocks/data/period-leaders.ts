@@ -15,13 +15,15 @@ import type {
 import { PERIOD_KEYS, PERIOD_SPANS, PERIOD_UNITS } from './periods';
 
 /**
- * How far down each period's ranking the page goes. A leaderboard is a cut of
- * the market, not the whole of it, and that goes double here: this table
- * carries better than twelve thousand symbols in a single session, so eight
- * unbounded rankings would send the entire board over the wire eight times to
- * show the top of it. The PH page cuts at the same fifty.
+ * How far down each period's ranking the page goes. The other three markets
+ * send every gainer and let the table turn through them, and this one cannot:
+ * the table carries better than twelve thousand symbols in a single session,
+ * so eight unbounded rankings would send most of the board over the wire eight
+ * times. Five hundred is ten pages of the table — see `LeadersTable` — which
+ * is further down than a leaderboard is read, and a payload the page can
+ * carry.
  */
-export const LEADERS_LIMIT = 50;
+export const LEADERS_LIMIT = 500;
 
 /**
  * The stocks ranked by how far they rose over each period — the turn in

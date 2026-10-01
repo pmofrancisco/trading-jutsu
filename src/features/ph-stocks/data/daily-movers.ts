@@ -15,7 +15,7 @@ import { PSE_INDEX_SYMBOLS } from './pse-indices';
  * A movers page is the ends of the board, not the whole of it. The PSE lists a
  * few hundred stocks and most of them move a little every session, so an
  * uncapped page shipped a row for each of them to show the handful anyone came
- * to read. Fifty, the same depth `LEADERS_LIMIT` cuts each ranking to.
+ * to read. Fifty, the same depth every other market caps its lists at.
  */
 export const MOVER_LIMIT = 50;
 

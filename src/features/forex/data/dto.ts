@@ -186,8 +186,8 @@ export interface RankedPeriodLeaders {
    * The stand-in logo for a symbol the bucket has no file for, which a minority
    * of the board still is — fifteen of the seventy-one pairs today, though
    * `NOKSEK` is among them and has led a ranking. Carried once here rather than
-   * on every row, because it is one value per market and fifty rows repeating it
-   * would be the same string fifty times over the wire.
+   * on every row, because it is one value per market and every row repeating it
+   * would be the same string once per row over the wire.
    */
   fallbackLogoUrl: string;
   periods: Record<PerformancePeriod, Record<PeriodSpan, PeriodWindow>>;

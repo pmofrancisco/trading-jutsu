@@ -1,5 +1,5 @@
-import SymbolLogo from '@/components/symbol-logo';
-import { Table } from '@heroui/react';
+import type { FormattedLeader } from '@/components/paged-leaders-table';
+import PagedLeadersTable from '@/components/paged-leaders-table';
 
 /**
  * One symbol's standing in a period's ranking, as a table renders it.
@@ -34,25 +34,33 @@ export interface LeaderFormat {
 }
 
 /**
+ * How many rows of a ranking are on show at once.
+ *
+ * Fifty, which is what the page showed when a ranking was cut there, so the
+ * first page of each is the table it always was. It lives here and not in a
+ * data layer because it is no longer a limit on any query: the rankings arrive
+ * whole — or, on the one board too large for that, cut far deeper than this —
+ * and how many rows share a screen is the table's own business.
+ */
+const LEADERS_PAGE_SIZE = 50;
+
+/**
  * One period's ranking.
  *
- * A Server Component, like the feature UI that wraps it: `Table` and its parts
- * carry their own `'use client'`, so the rows cross the boundary already
- * formatted and no figure is rendered twice in two locales. That does rule out
- * the collection props that take a callback — `items` and `renderEmptyState` —
- * because a function cannot be serialised, so the rows are mapped here and the
- * empty case is answered before the table is reached at all.
+ * A Server Component that formats and hands over, because the two halves of the
+ * job sit either side of the client boundary. Writing a figure takes the
+ * market's formatters, which are functions and cannot be serialised; turning a
+ * page takes state in the browser. So every figure is written out here, once
+ * and in one locale, and `PagedLeadersTable` is handed rows of strings to page
+ * through.
  *
  * The empty message arrives as a prop, the way `MoversTable`'s does. There is
  * only ever the one case to describe — a window nothing on the board has the
  * history to be ranked over — but what is on the board differs: two of the three
  * markets list stocks and the third lists coins, and the sentence names them.
  * The default sits on the caller above, so a market that shares the phrasing
- * does not restate it.
- *
- * The rank is the row's position rather than a figure carried on it: the list
- * arrives ranked, and numbering it here is the one place the two cannot
- * disagree.
+ * does not restate it. It is answered here, before the client table is reached
+ * at all: an empty ranking has no rows to send and no page to turn.
  */
 export default function LeadersTable({
   emptyMessage,
@@ -77,71 +85,24 @@ export default function LeadersTable({
     return <p className="text-muted p-2 text-sm">{emptyMessage}</p>;
   }
 
+  const rows: FormattedLeader[] = leaders.map((leader) => ({
+    symbol: leader.symbol,
+    logoUrl: leader.logoUrl,
+    close: format.formatPrice(leader.close),
+    changePercent: format.formatPercent(leader.changePercent),
+    // Coloured by sign rather than by rank. Every figure a ranking holds is a
+    // gain — the queries drop the flat and the falling — so in practice this
+    // is always the up tone; it is still asked for rather than hardcoded,
+    // because the table is handed a `Leader` and cannot see what filtered it.
+    toneClassName: format.toneClassName(leader.changePercent),
+  }));
+
   return (
-    <Table variant="secondary">
-      {/* The one horizontal scroller: on a phone the columns are wider than the
-       * viewport, and without this the page itself would scroll. */}
-      <Table.ScrollContainer>
-        <Table.Content aria-label={label}>
-          <Table.Header>
-            {/* `w-0` so the column takes only what its two digits need and the
-             * rest of the width goes to the figures. */}
-            <Table.Column className="w-0 text-end" id="rank">
-              Rank
-            </Table.Column>
-            {/* `isRowHeader` makes the symbol the row's name, so a screen
-             * reader announces "AC, Close, 30.70" rather than a bare figure. */}
-            <Table.Column id="symbol" isRowHeader>
-              Symbol
-            </Table.Column>
-            <Table.Column className="text-end" id="close">
-              Close
-            </Table.Column>
-            <Table.Column className="text-end" id="changePercent">
-              % Change
-            </Table.Column>
-          </Table.Header>
-          <Table.Body>
-            {leaders.map((leader, index) => (
-              // `id` is what the collection keys the row by; React's own `key`
-              // does not reach it.
-              <Table.Row id={leader.symbol} key={leader.symbol}>
-                {/* `tabular-nums` so the digits line up column-wise instead of
-                 * shifting with the width of each glyph. */}
-                <Table.Cell className="text-muted text-end tabular-nums">
-                  {index + 1}
-                </Table.Cell>
-                <Table.Cell className="font-medium">
-                  {/* The mark and the symbol are one line: `items-center`
-                   * centres the two against each other rather than seating the
-                   * image on the text's baseline, which a taller box would
-                   * otherwise do. */}
-                  <div className="flex items-center gap-2">
-                    <SymbolLogo
-                      fallbackUrl={fallbackLogoUrl}
-                      src={leader.logoUrl}
-                    />
-                    {leader.symbol}
-                  </div>
-                </Table.Cell>
-                <Table.Cell className="text-end tabular-nums">
-                  {format.formatPrice(leader.close)}
-                </Table.Cell>
-                {/* Coloured by sign rather than by rank. Every figure a
-                 * ranking holds is a gain — the queries drop the flat and the
-                 * falling — so in practice this is always the up tone; it is
-                 * still asked for rather than hardcoded, because the table is
-                 * handed a `Leader` and cannot see what filtered it. */}
-                <Table.Cell
-                  className={`text-end font-medium tabular-nums ${format.toneClassName(leader.changePercent)}`}
-                >
-                  {format.formatPercent(leader.changePercent)}
-                </Table.Cell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table.Content>
-      </Table.ScrollContainer>
-    </Table>
+    <PagedLeadersTable
+      fallbackLogoUrl={fallbackLogoUrl}
+      label={label}
+      pageSize={LEADERS_PAGE_SIZE}
+      rows={rows}
+    />
   );
 }

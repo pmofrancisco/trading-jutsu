@@ -1,5 +1,6 @@
 'use client';
 
+import { PAGE_PARAM } from '@/components/page-param';
 import { useUrlParam } from '@/components/url-param';
 import { ToggleButton, ToggleButtonGroup } from '@heroui/react';
 import type { ReactNode } from 'react';
@@ -24,6 +25,13 @@ const SPAN_PARAM = 'span';
  * period that is running.
  */
 const SPANS: PeriodSpan[] = ['current', 'previous'];
+
+/**
+ * What picking a turn clears: the page of the ranking that was on show. The
+ * other turn ranks the same board over other days, so it is a different list
+ * and page 3 of one says nothing about the other.
+ */
+const SPAN_RESETS = [PAGE_PARAM];
 
 /**
  * A segmented control over the two turns, and the one that is selected.
@@ -61,7 +69,7 @@ export default function PeriodSpanToggle({
   /** Each turn's ranking, already rendered. */
   panels: Record<PeriodSpan, ReactNode>;
 }) {
-  const [selected, select] = useUrlParam(SPAN_PARAM, SPANS);
+  const [selected, select] = useUrlParam(SPAN_PARAM, SPANS, SPAN_RESETS);
 
   return (
     <>

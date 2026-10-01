@@ -1,7 +1,4 @@
-import {
-  LEADERS_LIMIT,
-  listPeriodLeaders,
-} from '@/features/forex/data/period-leaders';
+import { listPeriodLeaders } from '@/features/forex/data/period-leaders';
 import PeriodLeadersTabs from '@/features/forex/ui/period-leaders-tabs';
 import { Typography } from '@heroui/react';
 
@@ -32,7 +29,7 @@ export default async function Leaders() {
         <p className="text-muted text-sm">
           {asOf === null
             ? 'No leaders to show yet.'
-            : `The ${LEADERS_LIMIT} biggest gains over each period.`}
+            : 'Every pair that gained over each period, biggest gain first.'}
         </p>
       </div>
       {/* `asOf` is `null` only when the table holds no bars at all — see the
