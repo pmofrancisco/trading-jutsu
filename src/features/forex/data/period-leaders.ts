@@ -12,16 +12,6 @@ import type {
 import { PERIOD_KEYS, PERIOD_SPANS, PERIOD_UNITS } from './periods';
 
 /**
- * How far down each period's ranking the page goes. A leaderboard is a cut of
- * the market, not the whole of it. This board is the smallest of the four — a
- * little over seventy pairs — so the cut rarely bites today and no ranking has
- * yet reached it; it is here because the loader decides how many pairs there
- * are and the page should not change shape when it adds some. Every other
- * market cuts at the same fifty.
- */
-export const LEADERS_LIMIT = 50;
-
-/**
  * The pairs ranked by how far they rose over each period — the turn in
  * progress, and the turn before it.
  *
@@ -96,8 +86,13 @@ export const LEADERS_LIMIT = 50;
  * Only gains are ranked. A board of the smallest losses is a different page
  * from the one this heading promises, so a symbol that is flat or down over a
  * window drops out of that window's ranking rather than filling the bottom of
- * it. A ranking is therefore as long as the window has gainers, up to
- * `LEADERS_LIMIT`, and empty in a window nothing on the board rose over.
+ * it. A ranking is therefore as long as the window has gainers, and empty in
+ * a window nothing on the board rose over.
+ *
+ * Nothing cuts it short. The page shows fifty rows at a time and turns
+ * through the rest in the browser — see `LeadersTable` — so each ranking is
+ * sent whole, once, and a page further down it costs no query. This board is
+ * small enough to send that way; the US one is not, and still cuts.
  *
  * `::float8` converts Postgres `numeric` — which node-postgres would otherwise
  * hand back as a string — into a JavaScript number.
@@ -211,7 +206,7 @@ const PERIOD_LEADERS_SQL = `
   FROM periods p
   CROSS JOIN newest s
   LEFT JOIN ranked r
-    ON r.period = p.period AND r.span = p.span AND r.rank <= $4
+    ON r.period = p.period AND r.span = p.span
   ORDER BY p.period, p.span, r.rank
 `;
 
@@ -249,7 +244,6 @@ export async function listPeriodLeaders(): Promise<PeriodLeaders> {
     PERIOD_KEYS,
     PERIOD_UNITS,
     PERIOD_SPANS,
-    LEADERS_LIMIT,
   ]);
 
   // One value for the whole market, so it is resolved here rather than per row

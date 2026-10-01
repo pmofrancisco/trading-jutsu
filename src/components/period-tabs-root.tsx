@@ -1,5 +1,6 @@
 'use client';
 
+import { PAGE_PARAM } from '@/components/page-param';
 import { useUrlParam } from '@/components/url-param';
 import { Tabs } from '@heroui/react';
 import type { Key, ReactNode } from 'react';
@@ -7,6 +8,14 @@ import { useState } from 'react';
 
 /** The query parameter the selected window is kept in. */
 const PERIOD_PARAM = 'period';
+
+/**
+ * What picking a window clears: the page of the ranking that was on show, which
+ * counts through a different ranking — of a different length — under any other
+ * tab. Harmless where the panels hold nothing paged, there being no such
+ * parameter to clear.
+ */
+const PERIOD_RESETS = [PAGE_PARAM];
 
 /**
  * `Tabs` with its selection kept in the URL, so a refresh, a bookmark or a
@@ -29,7 +38,11 @@ export default function PeriodTabsRoot({
   children: ReactNode;
   periods: string[];
 }) {
-  const [selected, selectPeriod] = useUrlParam(PERIOD_PARAM, periods);
+  const [selected, selectPeriod] = useUrlParam(
+    PERIOD_PARAM,
+    periods,
+    PERIOD_RESETS,
+  );
 
   /*
    * Whether the pill behind the selected tab may slide, which it may not until

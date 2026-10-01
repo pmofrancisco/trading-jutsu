@@ -3,6 +3,9 @@
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useCallback } from 'react';
 
+/** What `resets` defaults to — one array, so the default is stable too. */
+const NO_RESETS: readonly string[] = [];
+
 /**
  * One choice kept in the query string, read and written in place.
  *
@@ -37,6 +40,16 @@ export function useUrlParam<Value extends string>(
    * parameter at all — so the bare URL still means what it did.
    */
   values: readonly Value[],
+  /**
+   * Other parameters to clear whenever this one is chosen: what only meant
+   * something under the old choice, as a page number does once the ranking it
+   * counted through is no longer the one on show. Cleared in the same write, so
+   * the URL never names the new choice beside a leftover of the old.
+   *
+   * Pass a constant rather than a literal: it is a dependency of `select`, and
+   * a fresh array each render would rebuild it each render.
+   */
+  resets: readonly string[] = NO_RESETS,
 ): [selected: Value, select: (value: Value) => void] {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -59,6 +72,10 @@ export function useUrlParam<Value extends string>(
         params.set(name, value);
       }
 
+      for (const reset of resets) {
+        params.delete(reset);
+      }
+
       const query = params.toString();
 
       window.history.replaceState(
@@ -67,7 +84,7 @@ export function useUrlParam<Value extends string>(
         query ? `${pathname}?${query}` : pathname,
       );
     },
-    [fallback, name, pathname, searchParams],
+    [fallback, name, pathname, resets, searchParams],
   );
 
   return [selected, select];
